@@ -1,4 +1,5 @@
 import { useAdminAuth } from "../context/AdminAuthContext";
+import { FaUserCircle } from "react-icons/fa";
 
 const DashboardHeader = ({ setIsOpen }) => {
     const { admin, logoutAdmin } = useAdminAuth();
@@ -35,11 +36,7 @@ const DashboardHeader = ({ setIsOpen }) => {
                     </div>
 
                     {/* Avatar */}
-                    <img
-                        src="https://i.pravatar.cc/40"
-                        alt="admin"
-                        className="hidden md:block w-10 h-10 rounded-full"
-                    />
+                    <FaUserCircle className="hidden md:block w-10 h-10 text-gray-500" />
 
                     {/* Logout */}
                     <button
