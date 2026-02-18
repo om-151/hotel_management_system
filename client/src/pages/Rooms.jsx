@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import API from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 const Rooms = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const IMAGE_BASE = "http://localhost:5000/";
+  const navigate = useNavigate();
 
   useEffect(() => {
     API.get("/rooms")
@@ -98,15 +100,24 @@ const Rooms = () => {
                 </div>
 
                 {/* Action Button */}
-                <button
-                  disabled={!room.availability}
-                  className={`w-full py-3 rounded-xl font-semibold transition ${room.availability
-                    ? "bg-amber-600 text-white hover:bg-amber-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                  {room.availability ? "Book Now" : "Unavailable"}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => navigate(`/rooms/details/${room._id}`)}
+                    className="w-1/2 py-3 rounded-xl font-semibold border border-amber-600 text-amber-600 hover:bg-amber-50 transition"
+                  >
+                    View Details
+                  </button>
+
+                  <button
+                    disabled={!room.availability}
+                    className={`w-1/2 py-3 rounded-xl font-semibold transition ${room.availability
+                        ? "bg-amber-600 text-white hover:bg-amber-700"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                  >
+                    {room.availability ? "Book Now" : "Unavailable"}
+                  </button>
+                </div>
               </div>
             </div>
           ))}

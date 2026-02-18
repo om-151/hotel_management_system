@@ -73,6 +73,16 @@ const getAllRooms = async (req, res) => {
     }
 };
 
+const getSingleRoom = async (req, res) => {
+    const room = await Room.findById(req.params.id);
+
+    if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+    }
+
+    res.status(200).json({ room });
+};
+
 /**
  * UPDATE ROOM (ADMIN ONLY)
  */
@@ -194,4 +204,5 @@ module.exports = {
     getAllRooms,
     updateRoom,
     deleteRoom,
+    getSingleRoom,
 };

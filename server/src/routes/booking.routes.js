@@ -6,6 +6,7 @@ const {
     getMyBookings,
     cancelBooking,
     completeBooking,
+    getAllBookings,
 } = require("../controllers/booking.controller");
 
 const router = express.Router();
@@ -16,6 +17,7 @@ router.get("/my-bookings", userAuthMiddleware, getMyBookings);
 router.put("/:id/cancel", userAuthMiddleware, cancelBooking);
 
 // ADMIN
+router.get("/", adminAuthMiddleware, getAllBookings);
 router.put("/:id/complete", adminAuthMiddleware, completeBooking);
 
 module.exports = router;
