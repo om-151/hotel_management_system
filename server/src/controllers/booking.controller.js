@@ -7,16 +7,14 @@ const Room = require("../models/Room");
 const createBooking = async (req, res) => {
     try {
         const { roomId, check_in_date, check_out_date } = req.body;
-        const userId = req.user.userId; // from userAuthMiddleware
+        const userId = req.user.userId;
 
-        // 1️⃣ Validate required fields
         if (!roomId || !check_in_date || !check_out_date) {
             return res.status(400).json({
                 message: "All booking fields are required",
             });
         }
 
-        // 2️⃣ Check if room exists
         const room = await Room.findById(roomId);
         if (!room) {
             return res.status(404).json({
@@ -24,14 +22,24 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // 3️⃣ Check room availability
-        if (!room.availability) {
+        // ✅ DATE CONFLICT CHECK
+        const existingBooking = await Booking.findOne({
+            roomId,
+            booking_status: "confirmed",
+            $or: [
+                {
+                    check_in_date: { $lt: check_out_date },
+                    check_out_date: { $gt: check_in_date },
+                },
+            ],
+        });
+
+        if (existingBooking) {
             return res.status(400).json({
-                message: "Room is not available",
+                message: "Room already booked for selected dates",
             });
         }
 
-        // 4️⃣ Create booking
         const booking = await Booking.create({
             userId,
             roomId,
@@ -80,7 +88,7 @@ const getMyBookings = async (req, res) => {
 const cancelBooking = async (req, res) => {
     try {
         const bookingId = req.params.id;
-        const userId = req.user.id;
+        const userId = req.user.userId;
 
         const booking = await Booking.findById(bookingId);
         if (!booking) {
@@ -105,6 +113,10 @@ const cancelBooking = async (req, res) => {
 
         booking.booking_status = "cancelled";
         await booking.save();
+
+        await Room.findByIdAndUpdate(booking.roomId, {
+            availability: true,
+        });
 
         res.status(200).json({
             message: "Booking cancelled successfully",
@@ -170,10 +182,31 @@ const getAllBookings = async (req, res) => {
     }
 };
 
+// GET BOOKINGS OF SPECIFIC ROOM (for calendar blocking)
+const getRoomBookings = async (req, res) => {
+    try {
+        const { roomId } = req.params;
+
+        const bookings = await Booking.find({
+            roomId,
+            booking_status: "confirmed",
+        }).select("check_in_date check_out_date");
+
+        res.status(200).json({ bookings });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch room bookings",
+            error: error.message,
+        });
+    }
+};
+
+
 module.exports = {
     createBooking,
     getMyBookings,
     cancelBooking,
     completeBooking,
     getAllBookings,
+    getRoomBookings,
 };

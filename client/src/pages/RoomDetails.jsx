@@ -12,9 +12,11 @@ const RoomDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const IMAGE_BASE = "http://localhost:5000/";
+    const token = localStorage.getItem("userToken");
 
     const [room, setRoom] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [disabledDates, setDisabledDates] = useState([]);
     const [dateRange, setDateRange] = useState([
         {
             startDate: new Date(),
@@ -32,10 +34,30 @@ const RoomDetails = () => {
                 setRoom(res.data.room);
                 setLoading(false);
             })
-            .catch((err) => {
-                console.error(err);
-                setLoading(false);
-            });
+            .catch((err) => console.error(err));
+    }, [id]);
+
+    useEffect(() => {
+        API.get(`/bookings/room/${id}`)
+            .then((res) => {
+                const bookedDates = res.data.bookings.flatMap((booking) => {
+                    const start = new Date(booking.check_in_date);
+                    const end = new Date(booking.check_out_date);
+
+                    const dates = [];
+                    let current = new Date(start);
+
+                    while (current <= end) {
+                        dates.push(new Date(current));
+                        current.setDate(current.getDate() + 1);
+                    }
+
+                    return dates;
+                });
+
+                setDisabledDates(bookedDates);
+            })
+            .catch((err) => console.error(err));
     }, [id]);
 
     const handleBooking = async () => {
@@ -252,14 +274,10 @@ const RoomDetails = () => {
                     )}
 
                     <button
-                        disabled={!room.availability}
                         onClick={handleBooking}
-                        className={`w-full py-3 rounded-xl font-semibold transition ${room.availability
-                            ? "bg-amber-600 text-white hover:bg-amber-700 cursor-pointer"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            }`}
+                        className="w-full py-3 rounded-xl font-semibold bg-amber-600 text-white hover:bg-amber-700 cursor-pointer transition"
                     >
-                        Confirm Booking
+                        Confirm reservation
                     </button>
                 </div>
 
@@ -285,6 +303,7 @@ const RoomDetails = () => {
                                     minDate={new Date()}
                                     months={2}
                                     direction="horizontal"
+                                    disabledDates={disabledDates}
                                 />
                             </div>
                         </div>,

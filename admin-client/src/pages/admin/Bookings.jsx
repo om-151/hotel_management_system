@@ -1,15 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import DataTable from "react-data-table-component";
 import API from "../../api/axios";
 
 const Bookings = () => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [updatingId, setUpdatingId] = useState(null);
+    const [filterText, setFilterText] = useState("");
 
-    // Fetch All Bookings (Admin)
+    const BOOKINGS_API = "http://localhost:5000/api/bookings";
+    const token = localStorage.getItem("adminToken");
+
+    // Fetch All Bookings
     const fetchBookings = async () => {
         try {
             setLoading(true);
-            const res = await API.get("/bookings");
+            const res = await API.get(BOOKINGS_API, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             setBookings(res.data.bookings);
         } catch (error) {
             console.error(error);
@@ -22,24 +30,42 @@ const Bookings = () => {
         fetchBookings();
     }, []);
 
-    // Mark as Completed (Admin)
+    // ✅ Optimistic Status Update
     const handleComplete = async (id) => {
         try {
-            await API.put(`/bookings/${id}/complete`);
-            fetchBookings();
+            setUpdatingId(id);
+
+            // Call backend
+            await API.put(
+                `${BOOKINGS_API}/${id}/complete`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            // Update UI instantly
+            setBookings((prev) =>
+                prev.map((booking) =>
+                    booking._id === id
+                        ? { ...booking, booking_status: "completed" }
+                        : booking
+                )
+            );
         } catch (error) {
             console.error(error);
+        } finally {
+            setUpdatingId(null);
         }
     };
 
-    // Calculate total days
     const calculateDays = (checkIn, checkOut) => {
         const inDate = new Date(checkIn);
         const outDate = new Date(checkOut);
         return Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24));
     };
 
-    const getStatusStyle = (status) => {
+    const getStatusBadge = (status) => {
         switch (status) {
             case "confirmed":
                 return "bg-green-100 text-green-600";
@@ -52,132 +78,156 @@ const Bookings = () => {
         }
     };
 
-    return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Manage Bookings</h1>
-
-            {loading ? (
-                <p className="text-gray-500">Loading bookings...</p>
-            ) : (
-                <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
-                    <table className="min-w-full text-sm text-left">
-                        <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-                            <tr>
-                                <th className="px-6 py-4">User</th>
-                                <th className="px-6 py-4">Room</th>
-                                <th className="px-6 py-4">Stay Dates</th>
-                                <th className="px-6 py-4">Days</th>
-                                <th className="px-6 py-4">Status</th>
-                                <th className="px-6 py-4">Booked On</th>
-                                <th className="px-6 py-4 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {bookings?.map((booking) => (
-                                <tr
-                                    key={booking._id}
-                                    className="border-b hover:bg-gray-50 transition"
-                                >
-                                    {/* User */}
-                                    <td className="px-6 py-4">
-                                        <div className="font-semibold">
-                                            {booking.userId?.name}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {booking.userId?.email}
-                                        </div>
-                                    </td>
-
-                                    {/* Room */}
-                                    <td className="px-6 py-4">
-                                        <div>
-                                            Room #{booking.roomId?.roomNumber}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {booking.roomId?.type} | ₹
-                                            {booking.roomId?.price}
-                                        </div>
-                                    </td>
-
-                                    {/* Stay */}
-                                    <td className="px-6 py-4 text-xs">
-                                        <div>
-                                            {new Date(
-                                                booking.check_in_date
-                                            ).toLocaleDateString()}
-                                        </div>
-                                        <div>
-                                            to{" "}
-                                            {new Date(
-                                                booking.check_out_date
-                                            ).toLocaleDateString()}
-                                        </div>
-                                    </td>
-
-                                    {/* Days */}
-                                    <td className="px-6 py-4 font-semibold">
-                                        {calculateDays(
-                                            booking.check_in_date,
-                                            booking.check_out_date
-                                        )}{" "}
-                                        Days
-                                    </td>
-
-                                    {/* Status */}
-                                    <td className="px-6 py-4">
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
-                                                booking.booking_status
-                                            )}`}
-                                        >
-                                            {booking.booking_status}
-                                        </span>
-                                    </td>
-
-                                    {/* Created Date */}
-                                    <td className="px-6 py-4 text-xs text-gray-500">
-                                        {new Date(
-                                            booking.createdAt
-                                        ).toLocaleDateString()}
-                                    </td>
-
-                                    {/* Action */}
-                                    <td className="px-6 py-4 text-center">
-                                        {booking.booking_status ===
-                                            "confirmed" ? (
-                                            <button
-                                                onClick={() =>
-                                                    handleComplete(
-                                                        booking._id
-                                                    )
-                                                }
-                                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-lg text-xs transition"
-                                            >
-                                                Mark Completed
-                                            </button>
-                                        ) : (
-                                            <span className="text-gray-400 text-xs">
-                                                No Action
-                                            </span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-
-                            {bookings?.length === 0 && (
-                                <tr>
-                                    <td
-                                        colSpan="7"
-                                        className="text-center py-6 text-gray-500"
-                                    >
-                                        No bookings available.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+    const columns = [
+        {
+            name: "User",
+            selector: (row) => row.userId?.name,
+            sortable: true,
+            cell: (row) => (
+                <div>
+                    <p className="font-semibold">{row.userId?.name}</p>
+                    <p className="text-xs text-gray-500">{row.userId?.email}</p>
                 </div>
-            )}
+            ),
+        },
+        {
+            name: "Room",
+            selector: (row) => row.roomId?.roomNumber,
+            sortable: true,
+            cell: (row) => (
+                <div>
+                    <p>Room #{row.roomId?.roomNumber}</p>
+                    <p className="text-xs text-gray-500">
+                        {row.roomId?.type} | ₹{row.roomId?.price}
+                    </p>
+                </div>
+            ),
+        },
+        {
+            name: "Stay Dates",
+            cell: (row) => (
+                <div className="text-xs">
+                    <p>
+                        {new Date(row.check_in_date).toLocaleDateString()}
+                    </p>
+                    <p>
+                        to {new Date(row.check_out_date).toLocaleDateString()}
+                    </p>
+                </div>
+            ),
+        },
+        {
+            name: "Days",
+            sortable: true,
+            cell: (row) => (
+                <span className="font-semibold">
+                    {calculateDays(
+                        row.check_in_date,
+                        row.check_out_date
+                    )} Days
+                </span>
+            ),
+        },
+        {
+            name: "Status",
+            sortable: true,
+            cell: (row) => (
+                <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
+                        row.booking_status
+                    )}`}
+                >
+                    {row.booking_status}
+                </span>
+            ),
+        },
+        {
+            name: "Booked On",
+            sortable: true,
+            cell: (row) =>
+                new Date(row.createdAt).toLocaleDateString(),
+        },
+        {
+            name: "Action",
+            center: true,
+            cell: (row) =>
+                row.booking_status === "confirmed" ? (
+                    <button
+                        onClick={() => handleComplete(row._id)}
+                        disabled={updatingId === row._id}
+                        className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white px-3 py-1 rounded-lg text-xs transition"
+                    >
+                        {updatingId === row._id
+                            ? "Updating..."
+                            : "Mark Completed"}
+                    </button>
+                ) : (
+                    <span className="text-gray-400 text-xs">
+                        No Action
+                    </span>
+                ),
+        },
+    ];
+
+    const filteredData = useMemo(() => {
+        return bookings.filter((item) =>
+            item.userId?.name
+                ?.toLowerCase()
+                .includes(filterText.toLowerCase())
+        );
+    }, [bookings, filterText]);
+
+    const customStyles = {
+        rows: {
+            style: {
+                minHeight: "70px",
+            },
+        },
+        headCells: {
+            style: {
+                fontSize: "14px",
+                fontWeight: "600",
+                backgroundColor: "#f9fafb",
+            },
+        },
+        cells: {
+            style: {
+                fontSize: "13px",
+            },
+        },
+    };
+
+    return (
+        <div className="p-6 bg-gray-50 min-h-screen">
+            <div className="bg-white p-6 rounded-2xl shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        Manage Bookings
+                    </h1>
+
+                    <input
+                        type="text"
+                        placeholder="Search by user name..."
+                        className="border px-4 py-2 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        value={filterText}
+                        onChange={(e) =>
+                            setFilterText(e.target.value)
+                        }
+                    />
+                </div>
+
+                <DataTable
+                    columns={columns}
+                    data={filteredData}
+                    progressPending={loading}
+                    pagination
+                    highlightOnHover
+                    responsive
+                    striped
+                    customStyles={customStyles}
+                    noDataComponent="No bookings available."
+                />
+            </div>
         </div>
     );
 };
