@@ -6,6 +6,7 @@ const adminAuthRoutes = require("./routes/adminAuth.routes");
 const userAuthRoutes = require("./routes/userAuth.routes");
 const bookingRoutes = require("./routes/booking.routes");
 const roomRoutes = require("./routes/room.routes");
+const userRoutes = require("./routes/user.routes");
 
 const app = express();
 
@@ -30,5 +31,8 @@ app.use("/api/bookings", bookingRoutes);
 
 // room routes
 app.use("/api/rooms", roomRoutes);
+
+// user routes
+app.use("/api/users", userRoutes);
 
 module.exports = app;

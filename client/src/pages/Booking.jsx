@@ -101,10 +101,10 @@ const ClientBooking = () => {
                                 {/* Room Info */}
                                 <div>
                                     <h3 className="text-lg font-semibold">
-                                        Room #{booking.roomId?.roomNumber}
+                                        Room #{booking.roomId?.name}
                                     </h3>
                                     <p className="text-sm text-gray-500 capitalize">
-                                        {booking.roomId?.type}
+                                        {booking.roomId?.room_type}
                                     </p>
                                 </div>
 
@@ -152,7 +152,7 @@ const ClientBooking = () => {
                                         disabled={
                                             cancellingId === booking._id
                                         }
-                                        className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2 rounded-lg text-sm transition"
+                                        className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2 rounded-lg text-sm transition cursor-pointer"
                                     >
                                         {cancellingId === booking._id
                                             ? "Cancelling..."

@@ -82,12 +82,12 @@ const DashboardSidebar = ({ isOpen, setIsOpen }) => {
                     </NavLink>
 
                     <NavLink
-                        to="/admin/dashboard/customers"
+                        to="/admin/dashboard/users"
                         className={linkClasses}
                         onClick={closeOnMobile}
                     >
                         <UsersIcon className={iconClass} />
-                        Customers
+                        Users
                     </NavLink>
 
                 </nav>

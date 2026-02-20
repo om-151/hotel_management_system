@@ -1,141 +1,192 @@
-const DashboardHome = () => {
+import { useEffect, useState } from "react";
+import API from "../../api/axios";
+import {
+    FaUsers,
+    FaHotel,
+    FaCheckCircle,
+    FaTimesCircle,
+} from "react-icons/fa";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Legend,
+} from "recharts";
+
+const BASE_URL = "http://localhost:5000/api";
+
+const Dashboard = () => {
+    const [users, setUsers] = useState([]);
+    const [rooms, setRooms] = useState([]);
+    const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const token = localStorage.getItem("adminToken");
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [userRes, roomRes, bookingRes] = await Promise.all([
+                    API.get(`${BASE_URL}/users`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                    API.get(`${BASE_URL}/rooms`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                    API.get(`${BASE_URL}/bookings`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                ]);
+
+                setUsers(userRes.data.users || []);
+                setRooms(roomRes.data.rooms || []);
+                setBookings(bookingRes.data.bookings || []);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // 🔥 Dynamic Calculations
+    const totalUsers = users.length;
+    const totalRooms = rooms.length;
+    const availableRooms = rooms.filter(
+        (room) => room.availability === true
+    ).length;
+
+    const totalBookings = bookings.length;
+    const confirmedBookings = bookings.filter(
+        (b) => b.booking_status === "confirmed"
+    ).length;
+    const cancelledBookings = bookings.filter(
+        (b) => b.booking_status === "cancelled"
+    ).length;
+
+    // 📊 Chart Data
+    const bookingChartData = [
+        { name: "Confirmed", value: confirmedBookings },
+        { name: "Cancelled", value: cancelledBookings },
+    ];
+
+    const roomChartData = [
+        { name: "Total Rooms", value: totalRooms },
+        { name: "Available", value: availableRooms },
+    ];
+
+    if (loading) {
+        return (
+            <div className="pt-28 text-center text-lg font-semibold">
+                Loading Dashboard...
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-slate-100">
-            {/* Top Header */}
-            <header className="bg-white border-b border-slate-200 px-8 py-5">
-                <h1 className="text-xl font-semibold text-slate-900">
-                    Dashboard
-                </h1>
-                <p className="text-sm text-slate-500">
-                    Administrative overview
-                </p>
-            </header>
+        <div
+            className="min-h-screen px-8 py-8 bg-gray-50"
+        >
+            {/* ================= STAT CARDS ================= */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
 
-            <main className="px-8 py-8 space-y-8">
-                {/* Metrics */}
-                <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                    <Metric label="Total Users" value="1,284" />
-                    <Metric label="Active Bookings" value="356" />
-                    <Metric label="Monthly Revenue" value="₹6,42,500" />
-                    <Metric label="Pending Reviews" value="12" />
-                </section>
+                {[
+                    { label: "Total Users", value: totalUsers, icon: <FaUsers /> },
+                    { label: "Total Rooms", value: totalRooms, icon: <FaHotel /> },
+                    { label: "Available Rooms", value: availableRooms, icon: <FaCheckCircle /> },
+                    { label: "Total Bookings", value: totalBookings, icon: <FaHotel /> },
+                    { label: "Confirmed", value: confirmedBookings, icon: <FaCheckCircle /> },
+                    { label: "Cancelled", value: cancelledBookings, icon: <FaTimesCircle /> },
+                ].map((item, index) => (
+                    <div
+                        key={index}
+                        className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition duration-300 border-t-4"
+                        style={{ borderColor: "#4B9DA9" }}
+                    >
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <p className="text-gray-600 text-sm">
+                                    {item.label}
+                                </p>
+                                <h2
+                                    className="text-3xl font-semibold mt-2"
+                                    style={{ color: "#E37434" }}
+                                >
+                                    {item.value}
+                                </h2>
+                            </div>
 
-                {/* Data Sections */}
-                <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    {/* Activity Table */}
-                    <div className="xl:col-span-2 bg-white border border-slate-200">
-                        <div className="px-6 py-4 border-b border-slate-200">
-                            <h2 className="text-sm font-semibold text-slate-800 uppercase tracking-wide">
-                                Recent Activity
-                            </h2>
-                        </div>
-
-                        <table className="w-full text-sm">
-                            <tbody className="divide-y divide-slate-200">
-                                {[
-                                    "New user registration",
-                                    "Booking confirmed (#3942)",
-                                    "Room pricing updated",
-                                    "Payment processed",
-                                    "Admin role modified",
-                                ].map((item, idx) => (
-                                    <tr key={idx}>
-                                        <td className="px-6 py-4 text-slate-700">
-                                            {item}
-                                        </td>
-                                        <td className="px-6 py-4 text-slate-400 text-right">
-                                            {idx + 1}h ago
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* System Panel */}
-                    <div className="bg-white border border-slate-200">
-                        <div className="px-6 py-4 border-b border-slate-200">
-                            <h2 className="text-sm font-semibold text-slate-800 uppercase tracking-wide">
-                                System Controls
-                            </h2>
-                        </div>
-
-                        <div className="p-6 space-y-3">
-                            <ActionButton>Manage Users</ActionButton>
-                            <ActionButton>View Bookings</ActionButton>
-                            <ActionButton primary>System Settings</ActionButton>
+                            <div
+                                className="p-3 rounded-full text-white text-xl"
+                                style={{ backgroundColor: "#4B9DA9" }}
+                            >
+                                {item.icon}
+                            </div>
                         </div>
                     </div>
-                </section>
+                ))}
+            </div>
 
-                {/* Summary Table */}
-                <section className="bg-white border border-slate-200">
-                    <div className="px-6 py-4 border-b border-slate-200">
-                        <h2 className="text-sm font-semibold text-slate-800 uppercase tracking-wide">
-                            Latest Bookings
-                        </h2>
-                    </div>
+            {/* ================= CHARTS ================= */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-                    <table className="w-full text-sm">
-                        <thead className="bg-slate-50 text-slate-600 uppercase text-xs">
-                            <tr>
-                                <th className="px-6 py-3 text-left">Booking ID</th>
-                                <th className="px-6 py-3 text-left">Customer</th>
-                                <th className="px-6 py-3">Status</th>
-                                <th className="px-6 py-3 text-right">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {[
-                                ["#3942", "Rahul Sharma", "Confirmed", "₹18,000"],
-                                ["#3941", "Neha Patel", "Pending", "₹12,500"],
-                                ["#3940", "Aman Verma", "Completed", "₹22,000"],
-                            ].map((row, idx) => (
-                                <tr key={idx}>
-                                    <td className="px-6 py-4">{row[0]}</td>
-                                    <td className="px-6 py-4">{row[1]}</td>
-                                    <td className="px-6 py-4 text-center">
-                                        <span className="inline-block rounded border px-2 py-0.5 text-xs">
-                                            {row[2]}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        {row[3]}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </section>
-            </main>
+                {/* Booking Pie Chart */}
+                <div className="bg-white rounded-xl p-6 shadow-md">
+                    <h2
+                        className="text-lg font-semibold mb-6"
+                        style={{ color: "#4B9DA9" }}
+                    >
+                        Booking Overview
+                    </h2>
+
+                    <ResponsiveContainer width="100%" height={280}>
+                        <PieChart>
+                            <Pie
+                                data={bookingChartData}
+                                dataKey="value"
+                                outerRadius={100}
+                            >
+                                <Cell fill="#4B9DA9" />
+                                <Cell fill="#E37434" />
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Room Bar Chart */}
+                <div className="bg-white rounded-xl p-6 shadow-md">
+                    <h2
+                        className="text-lg font-semibold mb-6"
+                        style={{ color: "#4B9DA9" }}
+                    >
+                        Room Statistics
+                    </h2>
+
+                    <ResponsiveContainer width="100%" height={280}>
+                        <BarChart data={roomChartData}>
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar
+                                dataKey="value"
+                                fill="#91C6BC"
+                                radius={[6, 6, 0, 0]}
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
         </div>
     );
 };
 
-/* Small reusable components */
-
-const Metric = ({ label, value }) => (
-    <div className="bg-white border border-slate-200 p-6">
-        <p className="text-xs uppercase tracking-wide text-slate-500">
-            {label}
-        </p>
-        <p className="mt-2 text-2xl font-semibold text-slate-900">
-            {value}
-        </p>
-    </div>
-);
-
-const ActionButton = ({ children, primary }) => (
-    <button
-        className={`w-full text-sm px-4 py-2 border transition
-            ${
-                primary
-                    ? "bg-slate-900 text-white hover:bg-slate-800"
-                    : "border-slate-300 text-slate-700 hover:bg-slate-50"
-            }`}
-    >
-        {children}
-    </button>
-);
-
-export default DashboardHome;
+export default Dashboard;

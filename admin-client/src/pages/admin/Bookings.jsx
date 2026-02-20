@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import DataTable from "react-data-table-component";
 import API from "../../api/axios";
+import Swal from "sweetalert2";
 
 const Bookings = () => {
     const [bookings, setBookings] = useState([]);
@@ -32,10 +33,21 @@ const Bookings = () => {
 
     // ✅ Optimistic Status Update
     const handleComplete = async (id) => {
+        const result = await Swal.fire({
+            title: "Mark as Completed?",
+            text: "This booking will be marked as completed.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#f59e0b",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, Complete it!",
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             setUpdatingId(id);
 
-            // Call backend
             await API.put(
                 `${BOOKINGS_API}/${id}/complete`,
                 {},
@@ -44,7 +56,6 @@ const Bookings = () => {
                 }
             );
 
-            // Update UI instantly
             setBookings((prev) =>
                 prev.map((booking) =>
                     booking._id === id
@@ -52,8 +63,22 @@ const Bookings = () => {
                         : booking
                 )
             );
+
+            // ✅ Success Alert
+            Swal.fire({
+                title: "Completed!",
+                text: "Booking has been marked as completed.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+            });
+
         } catch (error) {
-            console.error(error);
+            Swal.fire({
+                title: "Error!",
+                text: "Something went wrong.",
+                icon: "error",
+            });
         } finally {
             setUpdatingId(null);
         }
@@ -155,7 +180,7 @@ const Bookings = () => {
                     <button
                         onClick={() => handleComplete(row._id)}
                         disabled={updatingId === row._id}
-                        className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white px-3 py-1 rounded-lg text-xs transition"
+                        className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white px-3 py-1 rounded-lg text-xs transition cursor-pointer"
                     >
                         {updatingId === row._id
                             ? "Updating..."
@@ -180,7 +205,7 @@ const Bookings = () => {
     const customStyles = {
         rows: {
             style: {
-                minHeight: "70px",
+                minHeight: "60px",
             },
         },
         headCells: {
@@ -208,7 +233,7 @@ const Bookings = () => {
                     <input
                         type="text"
                         placeholder="Search by user name..."
-                        className="border px-4 py-2 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        className="border border-gray-300 px-4 py-2 rounded-lg text-sm w-full sm:w-64 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         value={filterText}
                         onChange={(e) =>
                             setFilterText(e.target.value)

@@ -3,6 +3,7 @@ import DataTable from "react-data-table-component";
 import API from "../../api/axios";
 import { PencilIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/outline";
 import RoomForm from "./RoomForm";
+import Swal from "sweetalert2";
 
 const ROOMS_API = "http://localhost:5000/api/rooms";
 const IMAGE_BASE = "http://localhost:5000/";
@@ -33,15 +34,39 @@ const Rooms = () => {
     }, []);
 
     const handleDelete = async (id) => {
-        if (!confirm("Delete this room?")) return;
+        const result = await Swal.fire({
+            title: "Delete Room?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, Delete",
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             await API.delete(`${ROOMS_API}/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+
             setRooms((prev) => prev.filter((r) => r._id !== id));
+
+            Swal.fire({
+                title: "Deleted!",
+                text: "Room has been deleted successfully.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+            });
+
         } catch {
-            alert("Delete failed");
+            Swal.fire({
+                title: "Error!",
+                text: "Delete failed.",
+                icon: "error",
+            });
         }
     };
 
@@ -98,8 +123,8 @@ const Rooms = () => {
             cell: (row) => (
                 <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${row.availability
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
                         }`}
                 >
                     {row.availability ? "Available" : "Booked"}
@@ -116,14 +141,16 @@ const Rooms = () => {
                             setEditingRoom(row);
                             setShowForm(true);
                         }}
-                        className="p-2 rounded-lg border hover:bg-gray-100"
+                        className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition-all duration-200 cursor-pointer"
+                        title="Edit Room"
                     >
                         <PencilIcon className="w-4 h-4" />
                     </button>
 
                     <button
                         onClick={() => handleDelete(row._id)}
-                        className="p-2 rounded-lg border text-red-600 hover:bg-red-50"
+                        className="flex items-center justify-center w-9 h-9 rounded-full bg-red-100 text-red-600 hover:bg-red-200 hover:scale-105 transition-all duration-200 cursor-pointer"
+                        title="Delete Room"
                     >
                         <TrashIcon className="w-4 h-4" />
                     </button>
@@ -135,7 +162,7 @@ const Rooms = () => {
     const customStyles = {
         rows: {
             style: {
-                minHeight: "72px",
+                minHeight: "60px",
             },
         },
         headCells: {
@@ -165,7 +192,7 @@ const Rooms = () => {
                         <input
                             type="text"
                             placeholder="Search rooms..."
-                            className="border px-4 py-2 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-indigo-400 outline-none"
+                            className="border px-4 py-2 border-gray-300 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-blue-500 outline-none"
                             value={filterText}
                             onChange={(e) =>
                                 setFilterText(e.target.value)
@@ -177,7 +204,7 @@ const Rooms = () => {
                                 setEditingRoom(null);
                                 setShowForm(true);
                             }}
-                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm transition"
+                            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition cursor-pointer"
                         >
                             <PlusIcon className="w-4 h-4" />
                             Add Room
