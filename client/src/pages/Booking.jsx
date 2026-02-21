@@ -76,91 +76,157 @@ const ClientBooking = () => {
         }
     };
 
-    return (
-        <div className="pt-28 pb-16 px-6 bg-gray-50 min-h-screen">
-            <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold mb-10 text-center text-gray-800">
-                    My Bookings
-                </h2>
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
 
+    return (
+        <div className="pt-20 pb-20 px-4 sm:px-6 bg-gray-50 min-h-screen">
+            <div className="max-w-7xl mx-auto">
+
+                {/* Header */}
+                <div className="flex items-center justify-between mb-10">
+                    <h2 className="text-3xl font-semibold text-amber-700">
+                        My Trips
+                    </h2>
+                    <span className="text-sm text-gray-500">
+                        {bookings.length} bookings
+                    </span>
+                </div>
+
+                {/* Loading State */}
                 {loading ? (
-                    <p className="text-center text-gray-500">
-                        Loading bookings...
-                    </p>
+                    <div className="space-y-6">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="animate-pulse bg-white rounded-2xl h-40" />
+                        ))}
+                    </div>
                 ) : bookings.length === 0 ? (
-                    <div className="text-center text-gray-500">
-                        No bookings found.
+                    /* Empty State */
+                    <div className="text-center py-24 bg-white rounded-2xl shadow-sm">
+                        <h3 className="text-xl font-semibold text-gray-800">
+                            No trips booked yet
+                        </h3>
+                        <p className="text-gray-500 mt-2">
+                            Once you book a stay, it will appear here.
+                        </p>
                     </div>
                 ) : (
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {bookings.map((booking) => (
-                            <div
-                                key={booking._id}
-                                className="bg-white rounded-2xl shadow-md p-6 space-y-4"
-                            >
-                                {/* Room Info */}
-                                <div>
-                                    <h3 className="text-lg font-semibold">
-                                        Room #{booking.roomId?.name}
-                                    </h3>
-                                    <p className="text-sm text-gray-500 capitalize">
-                                        {booking.roomId?.room_type}
-                                    </p>
-                                </div>
+                    <div className="space-y-8">
+                        {bookings.map((booking) => {
+                            const totalDays = calculateDays(
+                                booking.check_in_date,
+                                booking.check_out_date
+                            );
 
-                                {/* Dates */}
-                                <div className="text-sm text-gray-600 space-y-1">
-                                    <p>
-                                        <strong>Check-in:</strong>{" "}
-                                        {new Date(
-                                            booking.check_in_date
-                                        ).toLocaleDateString()}
-                                    </p>
-                                    <p>
-                                        <strong>Check-out:</strong>{" "}
-                                        {new Date(
-                                            booking.check_out_date
-                                        ).toLocaleDateString()}
-                                    </p>
-                                    <p>
-                                        <strong>Stay:</strong>{" "}
-                                        {calculateDays(
-                                            booking.check_in_date,
-                                            booking.check_out_date
-                                        )}{" "}
-                                        Days
-                                    </p>
-                                </div>
+                            const pricePerNight = booking.roomId?.price || 0;
+                            const totalPrice = totalDays * pricePerNight;
 
-                                {/* Status */}
-                                <div>
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
-                                            booking.booking_status
-                                        )}`}
-                                    >
-                                        {booking.booking_status}
-                                    </span>
-                                </div>
+                            return (
+                                <div
+                                    key={booking._id}
+                                    className="bg-white rounded-3xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden border border-gray-100"
+                                >
+                                    <div className="flex flex-col md:flex-row">
 
-                                {/* Action */}
-                                {booking.booking_status === "confirmed" && (
-                                    <button
-                                        onClick={() =>
-                                            handleCancel(booking._id)
-                                        }
-                                        disabled={
-                                            cancellingId === booking._id
-                                        }
-                                        className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2 rounded-lg text-sm transition cursor-pointer"
-                                    >
-                                        {cancellingId === booking._id
-                                            ? "Cancelling..."
-                                            : "Cancel Booking"}
-                                    </button>
-                                )}
-                            </div>
-                        ))}
+                                        {/* Room Image */}
+                                        <div className="w-full md:w-1/3">
+                                            <div className="relative w-full aspect-[4/3] md:aspect-[3/2] overflow-hidden rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none">
+                                                <img
+                                                    src={
+                                                        booking.roomId?.images?.[0]
+                                                            ? `http://localhost:5000/${booking.roomId.images[0]}`
+                                                            : "https://images.unsplash.com/photo-1501117716987-c8e3f3b15e47"
+                                                    }
+                                                    alt="room"
+                                                    className="absolute inset-0 w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="flex-1 p-6 flex flex-col justify-between">
+
+                                            {/* Top Info */}
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h3 className="text-xl font-semibold text-gray-900">
+                                                            {booking.roomId?.name}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-500 capitalize">
+                                                            {booking.roomId?.room_type}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Status Badge */}
+                                                    <span
+                                                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
+                                                            booking.booking_status
+                                                        )}`}
+                                                    >
+                                                        {booking.booking_status}
+                                                    </span>
+                                                </div>
+
+                                                {/* Dates */}
+                                                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                                    <div>
+                                                        <p className="text-gray-400">Check-in</p>
+                                                        <p className="font-medium">
+                                                            {formatDate(booking.check_in_date)}
+                                                        </p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-gray-400">Check-out</p>
+                                                        <p className="font-medium">
+                                                            {formatDate(booking.check_out_date)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="text-sm text-gray-600">
+                                                    {totalDays} nights · ₹{pricePerNight} per night
+                                                </div>
+                                            </div>
+
+                                            {/* Bottom Section */}
+                                            <div className="flex items-center justify-between mt-6 pt-4 border-t">
+
+                                                {/* Total Price */}
+                                                <div>
+                                                    <p className="text-gray-400 text-sm">
+                                                        Total Paid
+                                                    </p>
+                                                    <p className="text-lg font-semibold text-gray-900">
+                                                        ₹{totalPrice}
+                                                    </p>
+                                                </div>
+
+                                                {/* Cancel Button */}
+                                                {booking.booking_status === "confirmed" && (
+                                                    <button
+                                                        onClick={() => handleCancel(booking._id)}
+                                                        disabled={cancellingId === booking._id}
+                                                        className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl text-sm transition disabled:opacity-50 cursor-pointer"
+                                                    >
+                                                        {cancellingId === booking._id
+                                                            ? "Cancelling..."
+                                                            : "Cancel"}
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

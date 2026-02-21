@@ -12,7 +12,6 @@ const RoomDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const IMAGE_BASE = "http://localhost:5000/";
-    const token = localStorage.getItem("userToken");
 
     const [room, setRoom] = useState(null);
     const [loading, setLoading] = useState(true);

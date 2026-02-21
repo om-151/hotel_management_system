@@ -1,19 +1,49 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
+import Swal from "sweetalert2";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Signup = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
     const { login } = useAuth();
 
+    // 🔹 Validation
+    const validate = () => {
+        let newErrors = {};
+
+        if (!name.trim()) {
+            newErrors.name = "Full name is required";
+        }
+
+        if (!email) {
+            newErrors.email = "Email is required";
+        } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+            newErrors.email = "Enter a valid email address";
+        }
+
+        if (!password) {
+            newErrors.password = "Password is required";
+        } else if (password.length < 6) {
+            newErrors.password = "Password must be at least 6 characters";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) return;
 
         try {
             setLoading(true);
@@ -25,114 +55,157 @@ const Signup = () => {
             });
 
             login(res.data.token);
-            alert("Account created successfully ✅");
+
+            await Swal.fire({
+                icon: "success",
+                title: "Account Created",
+                text: "Welcome to the platform!",
+                confirmButtonColor: "#4B9DA9",
+            });
 
             navigate("/");
 
         } catch (error) {
-            alert(
-                error?.response?.data?.message ||
-                "Signup failed"
-            );
+            Swal.fire({
+                icon: "error",
+                title: "Signup Failed",
+                text:
+                    error?.response?.data?.message ||
+                    "Something went wrong",
+                confirmButtonColor: "#E37434",
+            });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+        <div className="min-h-screen flex flex-col lg:flex-row">
 
-            {/* LEFT BRAND SECTION */}
-            <div className="hidden lg:flex flex-col justify-center px-16 bg-amber-600 text-white">
-                <h1 className="text-4xl font-bold mb-4">
-                    Create Your Account
-                </h1>
-                <p className="text-lg opacity-90 max-w-md">
-                    Join our hotel management platform and manage everything in one place.
-                </p>
-
-                <div className="mt-12 border-l-4 border-white pl-6 text-sm opacity-90">
-                    Fast Setup • Secure Access • Professional Tools
-                </div>
+            {/* LEFT IMAGE */}
+            <div className="w-full lg:w-1/2 h-64 lg:h-auto relative">
+                <img
+                    src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"
+                    alt="hotel"
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-[#4B9DA9]/20"></div>
             </div>
 
-            {/* RIGHT SIGNUP SECTION */}
-            <div className="flex items-center justify-center bg-white px-6">
-                <div className="w-full max-w-md">
+            {/* RIGHT FORM */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 px-6 py-12">
 
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-2">
-                        Sign up
+                <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 sm:p-10">
+
+                    <h2 className="text-2xl font-semibold text-gray-900">
+                        Create your account
                     </h2>
-                    <p className="text-gray-500 mb-8">
-                        Create an account to get started
+                    <p className="text-sm text-gray-500 mt-2 mb-8">
+                        Get started with your free account
                     </p>
 
-                    <form onSubmit={handleSubmit} className="space-y-7">
+                    <form onSubmit={handleSubmit} className="space-y-6">
 
                         {/* Name */}
-                        <div className="relative">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Full Name
+                            </label>
                             <input
                                 type="text"
-                                required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="peer w-full border-b-2 border-gray-300 bg-transparent py-3 focus:border-amber-600 outline-none"
+                                placeholder="John Doe"
+                                className={`mt-2 w-full px-4 py-3 rounded-xl border 
+                                ${errors.name ? "border-red-500" : "border-gray-300"}
+                                focus:ring-2 focus:ring-[#E37434]/30 focus:border-amber-600
+                                outline-none transition`}
                             />
-                            <label className="absolute left-0 top-3 text-gray-500 transition-all
-                                peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
-                                peer-valid:-top-3 peer-valid:text-sm">
-                                Full name
-                            </label>
+                            {errors.name && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.name}
+                                </p>
+                            )}
                         </div>
 
                         {/* Email */}
-                        <div className="relative">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Email
+                            </label>
                             <input
-                                type="email"
-                                required
+                                type="text"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="peer w-full border-b-2 border-gray-300 bg-transparent py-3 focus:border-amber-600 outline-none"
+                                placeholder="you@example.com"
+                                className={`mt-2 w-full px-4 py-3 rounded-xl border 
+                                ${errors.email ? "border-red-500" : "border-gray-300"}
+                                focus:ring-2 focus:ring-[#E37434]/30 focus:border-amber-600
+                                outline-none transition`}
                             />
-                            <label className="absolute left-0 top-3 text-gray-500 transition-all
-                                peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
-                                peer-valid:-top-3 peer-valid:text-sm">
-                                Email address
-                            </label>
+                            {errors.email && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.email}
+                                </p>
+                            )}
                         </div>
 
                         {/* Password */}
-                        <div className="relative">
-                            <input
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="peer w-full border-b-2 border-gray-300 bg-transparent py-3 focus:border-amber-600 outline-none"
-                            />
-                            <label className="absolute left-0 top-3 text-gray-500 transition-all
-                                peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
-                                peer-valid:-top-3 peer-valid:text-sm">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
                                 Password
                             </label>
+
+                            <div className="relative mt-2">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter your password"
+                                    className={`w-full px-4 py-3 rounded-xl border pr-12
+                                    ${errors.password ? "border-red-500" : "border-gray-300"}
+                                    focus:ring-2 focus:ring-[#E37434]/30 focus:border-amber-600
+                                    outline-none transition`}
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#E37434] cursor-pointer"
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </button>
+                            </div>
+
+                            {errors.password && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.password}
+                                </p>
+                            )}
                         </div>
 
-                        {/* Button */}
+                        {/* Submit */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full mt-4 rounded-md bg-amber-600 py-3 text-white font-medium hover:bg-amber-700 transition disabled:opacity-70"
+                            className="w-full py-3 rounded-xl text-white font-medium 
+                                       bg-amber-600 hover:bg-amber-700
+                                       active:scale-[0.98] transition
+                                       disabled:opacity-60 cursor-pointer"
                         >
-                            {loading ? "Creating account..." : "Create account"}
+                            {loading ? "Creating account..." : "Create Account"}
                         </button>
 
                     </form>
 
-                    <p className="mt-10 text-center text-sm text-gray-500">
+                    <p className="mt-8 text-center text-sm text-gray-600">
                         Already have an account?{" "}
-                        <span className="text-amber-600 cursor-pointer hover:underline">
+                        <Link
+                            to="/login"
+                            className="text-amber-600 font-medium hover:underline"
+                        >
                             Sign in
-                        </span>
+                        </Link>
                     </p>
 
                 </div>

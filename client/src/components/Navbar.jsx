@@ -57,14 +57,14 @@ const Navbar = () => {
                         <>
                             <NavLink
                                 to="/login"
-                                className="px-6 py-2 rounded-full text-sm font-medium border border-gray-300 hover:border-amber-600 hover:text-amber-600 transition"
+                                className="px-6 py-2 rounded-full text-sm font-medium border border-amber-600 hover:bg-amber-600 transition text-amber-600 hover:text-white"
                             >
                                 Login
                             </NavLink>
 
                             <NavLink
                                 to="/signup"
-                                className="px-6 py-2 rounded-full text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition"
+                                className="px-6 py-2 rounded-full text-sm font-medium bg-amber-600 text-white hover:bg-transparent hover:text-amber-600 transition border hover:border-amber-600"
                             >
                                 Sign up
                             </NavLink>
@@ -72,7 +72,7 @@ const Navbar = () => {
                     ) : (
                         <button
                             onClick={handleLogout}
-                            className="px-6 py-2 rounded-full text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition"
+                            className="px-6 py-2 rounded-full text-sm font-medium bg-amber-600 text-white hover:bg-transparent hover:text-amber-600 border hover:border-amber-600 transition cursor-pointer"
                         >
                             Logout
                         </button>
@@ -81,7 +81,7 @@ const Navbar = () => {
 
                 {/* MOBILE TOGGLE */}
                 <button
-                    className="md:hidden text-2xl"
+                    className="md:hidden text-2xl cursor-pointer"
                     onClick={() => setOpen(!open)}
                 >
                     {open ? "✕" : "☰"}
@@ -140,7 +140,7 @@ const Navbar = () => {
                                     <NavLink
                                         to="/login"
                                         onClick={() => setOpen(false)}
-                                        className="block w-full text-center py-2 rounded-full border border-gray-300 hover:border-amber-600 transition"
+                                        className="block w-full text-center py-2 rounded-full transition border border-amber-600 hover:bg-amber-600 text-amber-600 hover:text-white"
                                     >
                                         Login
                                     </NavLink>
@@ -148,7 +148,7 @@ const Navbar = () => {
                                     <NavLink
                                         to="/signup"
                                         onClick={() => setOpen(false)}
-                                        className="block w-full text-center py-2 rounded-full bg-amber-600 text-white hover:bg-amber-700 transition"
+                                        className="block w-full text-center py-2 rounded-full  transition bg-amber-600 text-white hover:bg-transparent hover:text-amber-600 border hover:border-amber-600"
                                     >
                                         Sign up
                                     </NavLink>
@@ -156,7 +156,7 @@ const Navbar = () => {
                             ) : (
                                 <button
                                     onClick={handleLogout}
-                                    className="block w-full text-center py-3 rounded-full bg-red-500 text-white hover:bg-red-600 transition"
+                                    className="block w-full text-center py-3 rounded-full bg-amber-600 text-white hover:bg-transparent hover:text-amber-600 border hover:border-amber-600 transition cursor-pointer"
                                 >
                                     Logout
                                 </button>
