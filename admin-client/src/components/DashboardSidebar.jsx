@@ -4,6 +4,7 @@ import {
     BuildingOffice2Icon,
     CalendarDaysIcon,
     UsersIcon,
+    ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 
 const DashboardSidebar = ({ isOpen, setIsOpen }) => {
@@ -88,6 +89,15 @@ const DashboardSidebar = ({ isOpen, setIsOpen }) => {
                     >
                         <UsersIcon className={iconClass} />
                         Users
+                    </NavLink>
+
+                    <NavLink
+                        to="/admin/dashboard/contacts"
+                        className={linkClasses}
+                        onClick={closeOnMobile}
+                    >
+                        <ChatBubbleLeftRightIcon className={iconClass} />
+                        Contacts
                     </NavLink>
 
                 </nav>

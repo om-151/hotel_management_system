@@ -14,6 +14,7 @@ import DashboardHome from "./pages/admin/DashboardHome";
 import Rooms from "./pages/admin/Rooms";
 import Bookings from "./pages/admin/Bookings";
 import Customers from "./pages/admin/Users";
+import Contacts from "./pages/admin/Contacts";
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAdminAuth();
@@ -42,6 +43,7 @@ const App = () => {
           <Route path="rooms" element={<Rooms />} />
           <Route path="bookings" element={<Bookings />} />
           <Route path="users" element={<Customers />} />
+          <Route path="contacts" element={<Contacts />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/admin/login" />} />

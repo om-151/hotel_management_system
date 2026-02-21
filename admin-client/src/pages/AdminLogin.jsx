@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext";
+import loginBG from "../assets/login-bg.jpg";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const AdminLogin = () => {
   const { loginAdmin } = useAdminAuth();
@@ -10,78 +12,158 @@ const AdminLogin = () => {
     password: "",
   });
 
-  const handleChange = (e) =>
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  // ===== VALIDATION =====
+  const validateForm = () => {
+    let newErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     try {
+      setLoading(true);
       await loginAdmin(formData);
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      setErrors({
+        general: err.response?.data?.message || "Login failed",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      {/* LEFT BRAND SECTION */}
-      <div className="hidden lg:flex flex-col justify-center px-16 bg-indigo-600 text-white">
-        <h1 className="text-4xl font-bold mb-4">
-          Hotel Management
-        </h1>
-        <p className="text-lg opacity-90">
-          Admin Control Panel
-        </p>
-        <p className="mt-6 text-sm opacity-80">
-          Manage rooms, bookings, customers and revenue from one place.
-        </p>
-      </div>
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
+      style={{
+        backgroundImage:
+          `url(${loginBG})`,
+      }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/55"></div>
 
-      {/* RIGHT FORM SECTION */}
-      <div className="flex items-center justify-center bg-slate-100">
-        <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-          <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Admin Login
-          </h2>
-          <p className="text-sm text-gray-500 text-center mt-1">
-            Sign in to your admin account
-          </p>
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-md mx-4">
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl rounded-3xl p-8 text-white">
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <input
-              type="email"
-              name="email"
-              placeholder="Admin Email"
-              className="w-full border px-4 py-2.5 rounded-lg
-              focus:ring-2 focus:ring-indigo-500 outline-none"
-              onChange={handleChange}
-              required
-            />
+          {/* Logo / Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold">
+              Admin Login
+            </h1>
+            <p className="text-sm text-gray-200 mt-2">
+              Secure access to hotel management dashboard
+            </p>
+          </div>
 
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              className="w-full border px-4 py-2.5 rounded-lg
-              focus:ring-2 focus:ring-indigo-500 outline-none"
-              onChange={handleChange}
-              required
-            />
+          {errors.general && (
+            <div className="my-4 text-2xl text-red-500 font-semibold text-center">
+              {errors.general}
+            </div>
+          )}
 
+          <form onSubmit={handleSubmit} className="space-y-5">
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm mb-2 text-gray-200">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 rounded-xl bg-white/10 border 
+                ${errors.email ? "border-red-400" : "border-white/30"} 
+                focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none transition`}
+                placeholder="Enter admin email"
+              />
+              {errors.email && (
+                <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="relative">
+              <label className="block text-sm mb-2 text-gray-200">
+                Password
+              </label>
+
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/10 border
+    ${errors.password ? "border-red-400" : "border-white/30"}
+    focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none transition`}
+                placeholder="Enter password"
+              />
+
+              {/* Eye Icon */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-[42px] text-gray-300 hover:text-amber-600 transition cursor-pointer"
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
+              </button>
+
+              {errors.password && (
+                <p className="text-red-400 text-xs mt-1">
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
+            {/* Button */}
             <button
-              className="w-full bg-indigo-600 text-white py-2.5 rounded-lg
-              hover:bg-indigo-700 transition font-medium"
+              type="submit"
+              disabled={loading}
+              className="w-full bg-amber-600 hover:bg-amber-700 transition-all duration-300 py-3 rounded-xl font-semibold shadow-lg disabled:opacity-70 cursor-pointer"
             >
-              Login
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 
-          {/* SIGNUP LINK */}
-          <p className="text-sm text-center text-gray-600 mt-6">
-            Don’t have an admin account?{" "}
+          {/* Signup */}
+          <p className="text-center text-sm text-gray-300 mt-6">
+            Don’t have an account?{" "}
             <Link
               to="/admin/signup"
-              className="text-indigo-600 font-medium hover:underline"
+              className="text-amber-600 font-medium hover:underline"
             >
               Create Admin
             </Link>

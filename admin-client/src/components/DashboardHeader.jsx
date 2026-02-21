@@ -1,8 +1,31 @@
 import { useAdminAuth } from "../context/AdminAuthContext";
 import { FaUserCircle } from "react-icons/fa";
+import { useRef } from "react";
 
 const DashboardHeader = ({ setIsOpen }) => {
     const { admin, logoutAdmin } = useAdminAuth();
+    const btnRef = useRef(null);
+
+    const handleMouseEnter = (e) => {
+        const btn = btnRef.current;
+        const rect = btn.getBoundingClientRect();
+
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const ripple = btn.querySelector(".ripple");
+
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.classList.remove("scale-0");
+        ripple.classList.add("scale-[15]");
+    };
+
+    const handleMouseLeave = () => {
+        const ripple = btnRef.current.querySelector(".ripple");
+        ripple.classList.remove("scale-[15]");
+        ripple.classList.add("scale-0");
+    };
 
     return (
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-gray-200">
@@ -40,10 +63,16 @@ const DashboardHeader = ({ setIsOpen }) => {
 
                     {/* Logout */}
                     <button
+                        ref={btnRef}
                         onClick={logoutAdmin}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition cursor-pointer"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        className="relative overflow-hidden flex items-center gap-2 px-6 py-2 text-sm font-medium text-amber-600 border border-amber-600 rounded-lg cursor-pointer transition-colors duration-300 hover:text-white"
                     >
-                        Logout
+                        {/* Ripple Background */}
+                        <span className="ripple absolute w-10 h-10 bg-amber-600 rounded-full pointer-events-none transform -translate-x-1/2 -translate-y-1/2 scale-0 transition-transform duration-700 ease-out"></span>
+
+                        <span className="relative z-10">Logout</span>
                     </button>
                 </div>
             </div>
