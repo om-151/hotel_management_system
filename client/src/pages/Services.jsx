@@ -195,7 +195,7 @@ const AboutServices = () => {
       </div>
 
       {/* ================= MISSION & VISION ================= */}
-      <div className="pb-20 bg-white">
+      <div className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
 
           {/* Section Header */}

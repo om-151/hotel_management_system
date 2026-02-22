@@ -51,7 +51,7 @@ const Home = () => {
             {/* ================= HERO ================= */}
             <section className="relative h-screen">
                 <img
-                    src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"
+                    src="https://img.freepik.com/premium-photo/hotels_883586-23307.jpg?w=740"
                     alt="Hotel"
                     className="absolute inset-0 w-full h-full object-cover"
                 />
