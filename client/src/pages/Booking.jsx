@@ -85,12 +85,12 @@ const ClientBooking = () => {
     };
 
     return (
-        <div className="pt-20 pb-20 px-4 sm:px-6 bg-gray-50 min-h-screen">
+        <div className="pt-24 pb-20 px-4 sm:px-6 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-10">
-                    <h2 className="text-3xl font-semibold text-amber-700">
+                    <h2 className="text-3xl font-semibold text-amber-600">
                         My Trips
                     </h2>
                     <span className="text-sm text-gray-500">

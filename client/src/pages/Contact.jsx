@@ -183,7 +183,7 @@ const Contact = () => {
             {/* ================= MAP + FORM SECTION ================= */}
             <section className="max-w-7xl mx-auto px-6 pb-28">
 
-                <div className="bg-white rounded-2xl p-5 md:p-10 grid lg:grid-cols-2 gap-12">
+                <div className="rounded-2xl p-5 md:p-10 grid lg:grid-cols-2 gap-12">
 
                     {/* Google Map */}
                     <div className="rounded-xl overflow-hidden h-[400px] shadow-md">

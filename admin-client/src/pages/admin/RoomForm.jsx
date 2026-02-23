@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import Swal from "sweetalert2";
 import API from "../../api/axios";
 
 const ROOMS_API = "http://localhost:5000/api/rooms";
@@ -127,144 +128,240 @@ const RoomForm = ({ editingRoom, onClose, onSuccess }) => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "Room Updated Successfully!",
+                    text: "The room details have been updated.",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+
             } else {
                 await API.post(ROOMS_API, formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "Room Created Successfully!",
+                    text: "New room has been added.",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
             }
 
             onSuccess();
             onClose();
+
         } catch (err) {
             console.error(err);
-            alert("Failed to save room");
+
+            Swal.fire({
+                icon: "error",
+                title: "Something went wrong!",
+                text: "Failed to save room.",
+                showConfirmButton: false,
+                timer: 2500,
+            });
         }
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 overflow-y-auto max-h-[90vh]">
-                <h2 className="text-2xl font-semibold mb-6">
-                    {editingRoom ? "Edit Room" : "Create Room"}
-                </h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+            <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-h-[90vh] overflow-y-auto custom-scroll">
 
-                <form onSubmit={handleSubmit} className="grid sm:grid-cols-2 gap-4">
+                {/* Header */}
+                <div className="sticky top-0 bg-white/90 backdrop-blur-md z-10 px-8 py-5 flex justify-between items-center">
+                    <div>
+                        <h2 className="text-2xl font-semibold text-gray-800">
+                            {editingRoom ? "Edit Room" : "Create Room"}
+                        </h2>
+                    </div>
+
+                    <button
+                        onClick={onClose}
+                        className="w-9 h-9 flex items-center justify-center rounded-full text-black font-bold transition cursor-pointer"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                {/* Form */}
+                <form
+                    onSubmit={handleSubmit}
+                    className="p-8 grid md:grid-cols-2 gap-6"
+                >
 
                     {/* Name */}
-                    <div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            Room Name
+                        </label>
                         <input
-                            className="border px-3 py-2 rounded w-full"
                             name="name"
                             value={form.name}
                             onChange={handleChange}
-                            placeholder="Room name"
+                            placeholder="Luxury Suite"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition"
                         />
-                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                        {errors.name && (
+                            <p className="text-red-500 text-xs">{errors.name}</p>
+                        )}
                     </div>
 
-                    {/* Room Type Dropdown */}
-                    <div>
+                    {/* Room Type */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            Room Type
+                        </label>
                         <select
                             name="room_type"
                             value={form.room_type}
                             onChange={handleChange}
-                            className="border px-3 py-2 rounded w-full"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition cursor-pointer"
                         >
-                            <option value="">Select Room Type</option>
+                            <option value="">Select Type</option>
                             {roomTypes.map((type) => (
                                 <option key={type} value={type}>
                                     {type}
                                 </option>
                             ))}
                         </select>
-                        {errors.room_type && <p className="text-red-500 text-sm">{errors.room_type}</p>}
+                        {errors.room_type && (
+                            <p className="text-red-500 text-xs">{errors.room_type}</p>
+                        )}
                     </div>
 
                     {/* City */}
-                    <div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            City
+                        </label>
                         <input
-                            className="border px-3 py-2 rounded w-full"
                             name="city"
                             value={form.city}
                             onChange={handleChange}
-                            placeholder="City"
+                            placeholder="Mumbai"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition"
                         />
-                        {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+                        {errors.city && (
+                            <p className="text-red-500 text-xs">{errors.city}</p>
+                        )}
                     </div>
 
                     {/* State */}
-                    <div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            State
+                        </label>
                         <input
-                            className="border px-3 py-2 rounded w-full"
                             name="state"
                             value={form.state}
                             onChange={handleChange}
-                            placeholder="State"
+                            placeholder="Gujarat"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition"
                         />
-                        {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
+                        {errors.state && (
+                            <p className="text-red-500 text-xs">{errors.state}</p>
+                        )}
                     </div>
 
                     {/* Price */}
-                    <div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            Price Per Night
+                        </label>
                         <input
                             type="number"
                             name="price"
                             value={form.price}
                             onChange={handleChange}
-                            placeholder="Price"
-                            className="border px-3 py-2 rounded w-full"
+                            placeholder="2500"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition"
                         />
-                        {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
+                        {errors.price && (
+                            <p className="text-red-500 text-xs">{errors.price}</p>
+                        )}
                     </div>
 
                     {/* Base Price */}
-                    <div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            Base Price
+                        </label>
                         <input
                             type="number"
                             name="base_price"
                             value={form.base_price}
                             onChange={handleChange}
-                            placeholder="Base Price"
-                            className="border px-3 py-2 rounded w-full"
+                            placeholder="2000"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition"
                         />
-                        {errors.base_price && <p className="text-red-500 text-sm">{errors.base_price}</p>}
+                        {errors.base_price && (
+                            <p className="text-red-500 text-xs">{errors.base_price}</p>
+                        )}
                     </div>
 
-                    {/* Rating Dropdown */}
-                    <div>
+                    {/* Rating */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            Rating
+                        </label>
                         <select
                             name="rating"
                             value={form.rating}
                             onChange={handleChange}
-                            className="border px-3 py-2 rounded w-full"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition cursor-pointer"
                         >
                             <option value="">Select Rating</option>
                             {ratingOptions.map((rate) => (
                                 <option key={rate} value={rate}>
-                                    {rate}
+                                    ⭐ {rate}
                                 </option>
                             ))}
                         </select>
-                        {errors.rating && <p className="text-red-500 text-sm">{errors.rating}</p>}
+                        {errors.rating && (
+                            <p className="text-red-500 text-xs">{errors.rating}</p>
+                        )}
+                    </div>
+
+                    {/* Availability Toggle */}
+                    <div className="flex items-center gap-3 mt-7">
+                        <input
+                            type="checkbox"
+                            name="availability"
+                            checked={form.availability}
+                            onChange={handleChange}
+                            className="w-5 h-5 accent-slate-900 cursor-pointer"
+                        />
+                        <span className="text-sm font-medium text-gray-700">
+                            Available for booking
+                        </span>
                     </div>
 
                     {/* Description */}
-                    <div className="sm:col-span-2">
+                    <div className="md:col-span-2 space-y-2">
+                        <label className="text-sm font-semibold text-gray-600">
+                            Room Description
+                        </label>
                         <textarea
-                            rows="3"
+                            rows="4"
                             name="room_desc"
                             value={form.room_desc}
                             onChange={handleChange}
-                            placeholder="Room description"
-                            className="border px-3 py-2 rounded w-full"
+                            placeholder="Write a detailed description of the room..."
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition resize-none"
                         />
-                        {errors.room_desc && <p className="text-red-500 text-sm">{errors.room_desc}</p>}
+                        {errors.room_desc && (
+                            <p className="text-red-500 text-xs">{errors.room_desc}</p>
+                        )}
                     </div>
 
-                    {/* Image Upload Area */}
-                    <div className="sm:col-span-2">
+                    {/* Upload Area */}
+                    <div className="md:col-span-2">
                         <div
                             onDragOver={(e) => {
                                 e.preventDefault();
@@ -273,11 +370,16 @@ const RoomForm = ({ editingRoom, onClose, onSuccess }) => {
                             onDragLeave={() => setDragActive(false)}
                             onDrop={handleDrop}
                             onClick={() => fileInputRef.current.click()}
-                            className={`border-2 border-dashed p-6 text-center rounded-lg cursor-pointer transition ${dragActive ? "border-slate-900 bg-slate-50" : "border-gray-300"
+                            className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition ${dragActive
+                                ? "border-slate-900 bg-slate-50"
+                                : "border-gray-300 hover:border-slate-600"
                                 }`}
                         >
-                            <p className="text-gray-500">
-                                Drag & Drop images here or click to upload
+                            <p className="text-gray-600 font-medium">
+                                Drag & Drop images here
+                            </p>
+                            <p className="text-sm text-gray-400 mt-1">
+                                or click to browse files
                             </p>
                             <input
                                 type="file"
@@ -289,38 +391,33 @@ const RoomForm = ({ editingRoom, onClose, onSuccess }) => {
                             />
                         </div>
                         {errors.images && (
-                            <p className="text-red-500 text-sm mt-2">{errors.images}</p>
+                            <p className="text-red-500 text-xs mt-2">{errors.images}</p>
                         )}
                     </div>
 
                     {/* Image Preview */}
-                    <div className="sm:col-span-2 flex flex-wrap gap-4 mt-3">
-                        {existingImages.map((img) => (
-                            <div key={img} className="relative">
+                    <div className="md:col-span-2 flex flex-wrap gap-5">
+                        {[...existingImages, ...newImages].map((img, i) => (
+                            <div
+                                key={i}
+                                className="relative group w-32 h-28 rounded-xl overflow-hidden shadow-md"
+                            >
                                 <img
-                                    src={IMAGE_BASE + img}
-                                    className="w-28 h-24 object-cover rounded"
+                                    src={
+                                        typeof img === "string"
+                                            ? IMAGE_BASE + img
+                                            : URL.createObjectURL(img)
+                                    }
+                                    className="w-full h-full object-cover group-hover:scale-105 transition"
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => removeExistingImage(img)}
-                                    className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full text-xs"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        ))}
-
-                        {newImages.map((img, i) => (
-                            <div key={i} className="relative">
-                                <img
-                                    src={URL.createObjectURL(img)}
-                                    className="w-28 h-24 object-cover rounded"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => removeNewImage(i)}
-                                    className="absolute -top-2 -right-2 bg-black text-white w-6 h-6 rounded-full text-xs"
+                                    onClick={() =>
+                                        typeof img === "string"
+                                            ? removeExistingImage(img)
+                                            : removeNewImage(i - existingImages.length)
+                                    }
+                                    className="absolute top-2 right-2 bg-black/70 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
                                 >
                                     ✕
                                 </button>
@@ -328,28 +425,20 @@ const RoomForm = ({ editingRoom, onClose, onSuccess }) => {
                         ))}
                     </div>
 
-                    {/* Availability */}
-                    <label className="sm:col-span-2 flex gap-2 items-center">
-                        <input
-                            type="checkbox"
-                            name="availability"
-                            checked={form.availability}
-                            onChange={handleChange}
-                        />
-                        Available
-                    </label>
-
                     {/* Buttons */}
-                    <div className="sm:col-span-2 flex justify-end gap-3 mt-4">
+                    <div className="md:col-span-2 flex justify-end gap-4 mt-6">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="border px-4 py-2 rounded"
+                            className="px-3 py-2 rounded-xl border border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white transition cursor-pointer font-semibold"
                         >
                             Cancel
                         </button>
-                        <button className="bg-slate-900 text-white px-6 py-2 rounded hover:bg-black transition">
-                            Save Room
+                        <button
+                            type="submit"
+                            className="px-6 py-2 rounded-xl bg-amber-600 text-white font-semibold shadow-md hover:bg-amber-700 transition cursor-pointer"
+                        >
+                            Save
                         </button>
                     </div>
                 </form>
