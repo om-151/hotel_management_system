@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BedDouble, Users } from "lucide-react";
 import API from "../api/axios";
 
 const ClientBooking = () => {
@@ -190,8 +191,29 @@ const ClientBooking = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="text-sm text-gray-600">
-                                                    {totalDays} nights · ₹{pricePerNight} per night
+                                                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mt-2">
+
+                                                    {/* Nights */}
+                                                    <span>
+                                                        {totalDays} nights · ₹{pricePerNight} per night
+                                                    </span>
+
+                                                    <span className="text-gray-300">•</span>
+
+                                                    {/* Rooms */}
+                                                    <div className="flex items-center gap-1">
+                                                        <BedDouble size={16} />
+                                                        <span>{booking.numberOfRooms || 1} Rooms</span>
+                                                    </div>
+
+                                                    <span className="text-gray-300">•</span>
+
+                                                    {/* Guests */}
+                                                    <div className="flex items-center gap-1">
+                                                        <Users size={16} />
+                                                        <span>{booking.numberOfGuests || 1} Guests</span>
+                                                    </div>
+
                                                 </div>
                                             </div>
 

@@ -100,7 +100,7 @@ const Contact = () => {
     };
 
     return (
-        <div className="bg-gray-50">
+        <div>
 
             {/* ================= TOP SECTION ================= */}
             <section className="max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">

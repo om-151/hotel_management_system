@@ -11,11 +11,14 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import BackToTop from "./pages/BackToTop";
+import TopRedirection from "./pages/TopRedirection";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
     <>
       <Navbar />
+      <TopRedirection />
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -26,6 +29,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <BackToTop />

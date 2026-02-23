@@ -7,11 +7,14 @@ import { format, differenceInDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { createPortal } from "react-dom";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const RoomDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const IMAGE_BASE = "http://localhost:5000/";
+    const MySwal = withReactContent(Swal);
 
     const [room, setRoom] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -23,6 +26,14 @@ const RoomDetails = () => {
             key: "selection",
         },
     ]);
+    const [rooms, setRooms] = useState(1);
+    const [guests, setGuests] = useState(1);
+
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [countryCode, setCountryCode] = useState("+91");
+    const [phone, setPhone] = useState("");
+    const [errors, setErrors] = useState({});
     const [showCalendar, setShowCalendar] = useState(false);
     // Lightbox State
     const [selectedIndex, setSelectedIndex] = useState(null);
@@ -60,23 +71,99 @@ const RoomDetails = () => {
     }, [id]);
 
     const handleBooking = async () => {
+        let newErrors = {};
+
         if (nights <= 0) {
-            alert("Please select valid check-in and check-out dates");
+            MySwal.fire({
+                icon: "warning",
+                title: "Invalid Dates",
+                text: "Please select valid check-in and check-out dates.",
+                confirmButtonColor: "#d97706",
+            });
             return;
         }
 
+        if (rooms > 3) {
+            newErrors.rooms = "Maximum 3 rooms allowed per reservation";
+        }
+
+        if (guests > rooms * 3) {
+            newErrors.guests = `Maximum ${rooms * 3} guests allowed for ${rooms} room(s)`;
+        }
+
+        if (!fullName.trim()) {
+            newErrors.fullName = "Full name is required";
+        } else if (fullName.trim().length < 3) {
+            newErrors.fullName = "Full name must be at least 3 characters";
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            newErrors.email = "Email is required";
+        } else if (!emailRegex.test(email)) {
+            newErrors.email = "Enter a valid email address";
+        }
+
+        const phoneRegex = /^[0-9]{8,12}$/;
+        if (!phone) {
+            newErrors.phone = "Mobile number is required";
+        } else if (!phoneRegex.test(phone)) {
+            newErrors.phone = "Enter valid mobile number";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+
+            MySwal.fire({
+                icon: "error",
+                title: "Validation Error",
+                text: "Please fix the highlighted fields before continuing.",
+                confirmButtonColor: "#d97706",
+            });
+
+            return;
+        }
+
+        setErrors({});
+
         try {
+            // Loading Alert
+            MySwal.fire({
+                title: "Processing Booking...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
             await API.post("/bookings", {
                 roomId: id,
                 check_in_date: dateRange[0].startDate,
                 check_out_date: dateRange[0].endDate,
+                numberOfRooms: rooms,
+                numberOfGuests: guests,
             });
 
-            alert("Booking Confirmed 🎉");
-            navigate("/my-bookings");
+            Swal.close();
+
+            MySwal.fire({
+                icon: "success",
+                title: "Booking Confirmed!",
+                text: "Your reservation has been successfully created.",
+                confirmButtonColor: "#d97706",
+            }).then(() => {
+                navigate("/booking");
+            });
+
         } catch (error) {
-            console.error(error);
-            alert("Booking failed");
+            Swal.close();
+
+            MySwal.fire({
+                icon: "error",
+                title: "Booking Failed",
+                text: "Something went wrong. Please try again.",
+                confirmButtonColor: "#dc2626",
+            });
         }
     };
 
@@ -210,74 +297,168 @@ const RoomDetails = () => {
                 </div>
 
                 {/* RIGHT SIDE BOOKING CARD */}
-                <div className="bg-white p-6 rounded-2xl shadow sticky top-24 h-fit space-y-6">
+                <div className="sticky top-24 h-fit">
+                    <div className="bg-white rounded-3xl shadow-xl p-8 space-y-6 border border-gray-100">
 
-                    <div>
-                        <p className="text-3xl font-bold text-amber-600">
-                            ₹{room.price}
-                            <span className="text-base text-gray-500 font-normal">
-                                {" "} / night
-                            </span>
-                        </p>
-                        <p className="text-md line-through my-1">₹{room.base_price}</p>
-                    </div>
+                        <p className="font-semibold text-2xl">Booking summary</p>
 
-                    {/* DATE SELECTOR */}
-                    <div
-                        onClick={() => setShowCalendar(true)}
-                        className="border rounded-xl p-4 cursor-pointer hover:shadow-md transition"
-                    >
-                        <div className="flex justify-between text-sm">
-                            <div>
-                                <p className="text-gray-400">Check-in</p>
-                                <p className="font-semibold">
-                                    {format(dateRange[0].startDate, "dd MMM yyyy")}
-                                </p>
-                            </div>
+                        {/* PRICE HEADER */}
+                        <div>
+                            <h2 className="text-3xl font-bold text-amber-600">
+                                ₹{room.price}
+                                <span className="text-base text-gray-400 font-normal"> /night</span>
+                            </h2>
+                            <p className="text-gray-400 line-through">₹{room.base_price}</p>
+                        </div>
 
-                            <div>
-                                <p className="text-gray-400">Check-out</p>
-                                <p className="font-semibold">
-                                    {format(dateRange[0].endDate, "dd MMM yyyy")}
-                                </p>
+                        {/* DATE SELECTOR */}
+                        <div
+                            onClick={() => setShowCalendar(true)}
+                            className="border rounded-2xl p-4 cursor-pointer hover:border-amber-500 transition"
+                        >
+                            <div className="flex justify-between text-sm">
+                                <div>
+                                    <p className="text-gray-400 text-xs">Check-in</p>
+                                    <p className="font-semibold">
+                                        {format(dateRange[0].startDate, "dd MMM yyyy")}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-400 text-xs">Check-out</p>
+                                    <p className="font-semibold">
+                                        {format(dateRange[0].endDate, "dd MMM yyyy")}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        {nights > 0 && (
-                            <p className="mt-3 text-sm bg-amber-100 text-amber-700 inline-block px-3 py-1 rounded-full">
-                                {nights} nights
-                            </p>
-                        )}
-                    </div>
-
-                    {/* PRICE BREAKDOWN */}
-                    {nights > 0 && (
-                        <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
-                            <div className="flex justify-between">
-                                <span>{nights} nights</span>
-                                <span>₹{totalPrice}</span>
+                        {/* ROOMS & GUESTS */}
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* ROOMS */}
+                            <div>
+                                <label className="text-xs text-gray-500">Rooms (max 3)</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="3"
+                                    value={rooms}
+                                    onChange={(e) => {
+                                        const value = Number(e.target.value);
+                                        if (value <= 3) setRooms(value);
+                                    }}
+                                    className="w-full border rounded-xl px-3 py-2 mt-1"
+                                />
+                                {errors.rooms && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.rooms}</p>
+                                )}
                             </div>
 
-                            {discount > 0 && (
-                                <div className="flex justify-between text-green-600">
-                                    <span>{discount}% discount</span>
-                                    <span>-₹{(totalPrice * discount) / 100}</span>
-                                </div>
+                            {/* GUESTS */}
+                            <div>
+                                <label className="text-xs text-gray-500">
+                                    Guests (max 3 per room)
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={guests}
+                                    onChange={(e) => {
+                                        const value = Number(e.target.value);
+                                        setGuests(value);
+                                    }}
+                                    className="w-full border rounded-xl px-3 py-2 mt-1"
+                                />
+                                {errors.guests && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.guests}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* USER DETAILS */}
+                        <div className="space-y-3 pt-5">
+
+                            <h3 className="font-semibold text-lg">Guest Information</h3>
+
+                            <input
+                                type="text"
+                                placeholder="Full Name"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                className="w-full border rounded-xl px-4 py-3"
+                            />
+                            {errors.fullName && (
+                                <p className="text-red-500 text-xs">{errors.fullName}</p>
                             )}
 
-                            <div className="flex justify-between font-semibold border-t pt-2 text-lg">
-                                <span>Total</span>
-                                <span>₹{finalPrice}</span>
-                            </div>
-                        </div>
-                    )}
+                            <input
+                                type="email"
+                                placeholder="Email Address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full border rounded-xl px-4 py-3"
+                            />
+                            {errors.email && (
+                                <p className="text-red-500 text-xs">{errors.email}</p>
+                            )}
 
-                    <button
-                        onClick={handleBooking}
-                        className="w-full py-3 rounded-xl font-semibold bg-amber-600 text-white hover:bg-amber-700 cursor-pointer transition"
-                    >
-                        Confirm reservation
-                    </button>
+                            <div className="flex gap-2">
+                                <select
+                                    value={countryCode}
+                                    onChange={(e) => setCountryCode(e.target.value)}
+                                    className="border rounded-xl px-3 py-3"
+                                >
+                                    <option value="+91">🇮🇳 +91</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+44">🇬🇧 +44</option>
+                                    <option value="+971">🇦🇪 +971</option>
+                                </select>
+
+                                <input
+                                    type="tel"
+                                    placeholder="Mobile Number"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className="w-full border rounded-xl px-4 py-3"
+                                />
+                            </div>
+                            {errors.phone && (
+                                <p className="text-red-500 text-xs">{errors.phone}</p>
+                            )}
+                        </div>
+
+                        {/* PRICE BREAKDOWN */}
+                        {nights > 0 && (
+                            <div className="bg-gray-50 p-5 rounded-2xl space-y-3 text-sm border">
+
+                                <div className="flex justify-between">
+                                    <span>{rooms} rooms × {nights} nights</span>
+                                    <span>₹{totalPrice * rooms}</span>
+                                </div>
+
+                                {discount > 0 && (
+                                    <div className="flex justify-between text-green-600">
+                                        <span>Discount ({discount}%)</span>
+                                        <span>-₹{((totalPrice * rooms) * discount) / 100}</span>
+                                    </div>
+                                )}
+
+                                <div className="border-t pt-3 flex justify-between font-bold text-lg">
+                                    <span>Total Amount to Pay</span>
+                                    <span>
+                                        ₹{(totalPrice * rooms) - ((totalPrice * rooms) * discount) / 100}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={handleBooking}
+                            className="w-full py-4 rounded-2xl font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 transition shadow-md cursor-pointer"
+                        >
+                            Confirm Reservation
+                        </button>
+
+                    </div>
                 </div>
 
                 {/* ================= FLOATING CALENDAR (PORTAL FIX) ================= */}

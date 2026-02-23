@@ -6,12 +6,32 @@ const Room = require("../models/Room");
  */
 const createBooking = async (req, res) => {
     try {
-        const { roomId, check_in_date, check_out_date } = req.body;
+        const {
+            roomId,
+            check_in_date,
+            check_out_date,
+            numberOfRooms,
+            numberOfGuests,
+        } = req.body;
+
         const userId = req.user.userId;
 
-        if (!roomId || !check_in_date || !check_out_date) {
+        // ✅ Basic Validation
+        if (
+            !roomId ||
+            !check_in_date ||
+            !check_out_date ||
+            !numberOfRooms ||
+            !numberOfGuests
+        ) {
             return res.status(400).json({
                 message: "All booking fields are required",
+            });
+        }
+
+        if (numberOfRooms < 1 || numberOfGuests < 1) {
+            return res.status(400).json({
+                message: "Rooms and guests must be at least 1",
             });
         }
 
@@ -22,16 +42,22 @@ const createBooking = async (req, res) => {
             });
         }
 
+        // ✅ Date conversion (important!)
+        const checkIn = new Date(check_in_date);
+        const checkOut = new Date(check_out_date);
+
+        if (checkIn >= checkOut) {
+            return res.status(400).json({
+                message: "Check-out date must be after check-in date",
+            });
+        }
+
         // ✅ DATE CONFLICT CHECK
         const existingBooking = await Booking.findOne({
             roomId,
             booking_status: "confirmed",
-            $or: [
-                {
-                    check_in_date: { $lt: check_out_date },
-                    check_out_date: { $gt: check_in_date },
-                },
-            ],
+            check_in_date: { $lt: checkOut },
+            check_out_date: { $gt: checkIn },
         });
 
         if (existingBooking) {
@@ -43,8 +69,10 @@ const createBooking = async (req, res) => {
         const booking = await Booking.create({
             userId,
             roomId,
-            check_in_date,
-            check_out_date,
+            check_in_date: checkIn,
+            check_out_date: checkOut,
+            numberOfRooms,
+            numberOfGuests,
             booking_status: "confirmed",
         });
 
