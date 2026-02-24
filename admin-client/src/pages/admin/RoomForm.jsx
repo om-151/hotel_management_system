@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import API from "../../api/axios";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 const ROOMS_API = "http://localhost:5000/api/rooms";
 const IMAGE_BASE = "http://localhost:5000/";
@@ -347,16 +349,22 @@ const RoomForm = ({ editingRoom, onClose, onSuccess }) => {
                         <label className="text-sm font-semibold text-gray-600">
                             Room Description
                         </label>
-                        <textarea
-                            rows="4"
-                            name="room_desc"
-                            value={form.room_desc}
-                            onChange={handleChange}
-                            placeholder="Write a detailed description of the room..."
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:outline-none transition resize-none"
-                        />
+
+                        <div className="bg-white border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-slate-900 transition">
+                            <ReactQuill
+                                theme="snow"
+                                value={form.room_desc}
+                                onChange={(value) =>
+                                    setForm((prev) => ({ ...prev, room_desc: value }))
+                                }
+                                placeholder="Write a detailed description of the room..."
+                            />
+                        </div>
+
                         {errors.room_desc && (
-                            <p className="text-red-500 text-xs">{errors.room_desc}</p>
+                            <p className="text-red-500 text-xs">
+                                {errors.room_desc}
+                            </p>
                         )}
                     </div>
 

@@ -100,7 +100,7 @@ const Contact = () => {
     };
 
     return (
-        <div>
+        <div className="bg-gradient-to-br from-amber-50 via-white to-amber-50">
 
             {/* ================= TOP SECTION ================= */}
             <section className="max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">
@@ -111,7 +111,7 @@ const Contact = () => {
                         Let’s Connect
                     </p>
 
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 leading-tight">
+                    <h1 className="text-3xl md:text-4xl font-bold text-amber-600 mt-4 leading-tight">
                         Stay In Touch With Us
                     </h1>
 
@@ -299,7 +299,7 @@ const Contact = () => {
 
 
             {/* ================= NEWSLETTER ================= */}
-            <section className="bg-white pb-20">
+            <section className="pb-20">
                 <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
 
                     <h2 className="text-2xl font-bold text-gray-900">

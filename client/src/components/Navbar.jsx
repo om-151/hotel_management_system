@@ -70,7 +70,7 @@ const Navbar = () => {
 
                                 <NavLink
                                     to="/signup"
-                                    className="px-6 py-2 rounded-full text-sm font-medium bg-amber-600 text-white hover:bg-amber-500 transition duration-300"
+                                    className="px-6 py-2 rounded-full text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition duration-300"
                                 >
                                     Sign up
                                 </NavLink>
@@ -78,7 +78,7 @@ const Navbar = () => {
                         ) : (
                             <button
                                 onClick={handleLogout}
-                                className="px-6 py-2 rounded-full text-sm font-medium bg-amber-600 text-white hover:bg-amber-500 transition duration-300 cursor-pointer"
+                                className="px-6 py-2 rounded-full text-sm font-medium border border-amber-600 text-amber-600 hover:bg-amber-600 transition duration-300 cursor-pointer hover:text-white"
                             >
                                 Logout
                             </button>
@@ -130,7 +130,7 @@ const Navbar = () => {
                                     <NavLink
                                         to="/signup"
                                         onClick={() => setOpen(false)}
-                                        className="block w-full text-center py-2 rounded-full bg-amber-600 text-white hover:bg-amber-500 transition"
+                                        className="block w-full text-center py-2 rounded-full bg-amber-600 text-white hover:bg-amber-700 transition"
                                     >
                                         Sign up
                                     </NavLink>
@@ -138,7 +138,7 @@ const Navbar = () => {
                             ) : (
                                 <button
                                     onClick={handleLogout}
-                                    className="block w-full text-center py-3 rounded-full bg-amber-600 text-white hover:bg-amber-500 transition cursor-pointer"
+                                    className="block w-full text-center py-3 rounded-full border border-amber-600 text-amber-600 hover:bg-amber-600 transition cursor-pointer hover:text-white"
                                 >
                                     Logout
                                 </button>

@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+    X, ChevronLeft, ChevronRight, MapPin, Star, Snowflake,
+    Wifi,
+    Tv,
+    Flame,
+    BatteryCharging,
+    Sparkles,
+    Car,
+    AlarmSmoke,
+    Fan
+} from "lucide-react";
 import API from "../api/axios";
 import { DateRange } from "react-date-range";
 import { format, differenceInDays } from "date-fns";
@@ -9,6 +19,7 @@ import "react-date-range/dist/theme/default.css";
 import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import DOMPurify from "dompurify";
 
 const RoomDetails = () => {
     const { id } = useParams();
@@ -247,50 +258,125 @@ const RoomDetails = () => {
 
                     {/* BASIC INFO */}
                     <div className="bg-white p-6 rounded-2xl shadow">
-                        <h1 className="text-3xl font-bold mb-2 capitalize">
-                            {room.name}
-                        </h1>
+                        <div className="flex items-start justify-between gap-4 mb-3">
 
-                        <p className="text-gray-500 mb-3">
-                            📍 {room.city}, {room.state}
-                        </p>
+                            <h1 className="text-2xl sm:text-3xl font-bold capitalize text-gray-900">
+                                {room.name}
+                            </h1>
 
-                        <div className="flex items-center gap-2 mb-4">
-                            {[...Array(5)].map((_, i) => (
-                                <span
-                                    key={i}
-                                    className={`text-xl ${i < Math.round(room.rating)
-                                        ? "text-yellow-400"
-                                        : "text-gray-300"
-                                        }`}
-                                >
-                                    ★
-                                </span>
-                            ))}
-                            <span className="text-gray-600 ml-2">
-                                {room.rating} / 5
+                            <span className="text-xs sm:text-sm font-medium bg-amber-100 text-amber-700 px-3 py-1 rounded-full capitalize whitespace-nowrap">
+                                {room.room_type}
                             </span>
+
                         </div>
 
-                        <p className="text-gray-700 leading-relaxed">
-                            {room.room_desc}
+                        <p className="text-gray-500 mb-3 capitalize">
+                            <MapPin size={18} className="inline mr-1 text-amber-600" />
+                            {room.city}, {room.state}
                         </p>
+
+                        <div className="flex items-center gap-3 mb-4">
+
+                            {/* Stars */}
+                            <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                        key={i}
+                                        size={16}
+                                        className={`${i < Math.round(room.rating)
+                                            ? "text-amber-500 fill-amber-500"
+                                            : "text-gray-300"
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Rating Badge */}
+                            <span className="text-sm font-medium text-gray-700 bg-gray-100 px-2.5 py-1 rounded-md">
+                                {room.rating?.toFixed(1)} / 5
+                            </span>
+
+                        </div>
+
+                        {/* Description */}
+                        <div className="w-full overflow-hidden">
+                            <div
+                                className="description-content text-sm sm:text-base text-gray-700 leading-relaxed"
+                                dangerouslySetInnerHTML={{
+                                    __html: DOMPurify.sanitize(room?.room_desc || ""),
+                                }}
+                            />
+                        </div>
+
+                        {/* <div>
+                            <div
+                                className="text-sm sm:text-base text-gray-700 leading-relaxed 
+                                    break-words overflow-hidden
+                                    [&_img]:max-w-full [&_img]:h-auto
+                                    [&_iframe]:w-full [&_iframe]:max-w-full
+                                    [&_p]:mb-3
+                                    [&_ul]:list-disc [&_ul]:pl-6
+                                    [&_ol]:list-decimal [&_ol]:pl-6"
+                                dangerouslySetInnerHTML={{
+                                    __html: DOMPurify.sanitize(room?.room_desc || ""),
+                                }}
+                            />
+                        </div> */}
                     </div>
 
                     {/* AMENITIES SECTION */}
-                    <div className="bg-white p-6 rounded-2xl shadow">
-                        <h2 className="text-xl font-semibold mb-4">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm">
+                        <h2 className="text-xl font-semibold mb-6 text-gray-900">
                             Amenities
                         </h2>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-700">
-                            <div>❄️ AC</div>
-                            <div>📶 Free Wi-Fi</div>
-                            <div>📺 TV</div>
-                            <div>🔥 Geyser</div>
-                            <div>🔌 Power Backup</div>
-                            <div>🧹 Daily Housekeeping</div>
-                            <div>🚗 Parking</div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 text-sm text-gray-700">
+
+                            <div className="flex items-center gap-3">
+                                <Snowflake size={18} className="text-amber-600" />
+                                <span>AC</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Wifi size={18} className="text-amber-600" />
+                                <span>Free Wi-Fi</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Tv size={18} className="text-amber-600" />
+                                <span>TV</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Flame size={18} className="text-amber-600" />
+                                <span>Geyser</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <BatteryCharging size={18} className="text-amber-600" />
+                                <span>Power Backup</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Sparkles size={18} className="text-amber-600" />
+                                <span>Daily Housekeeping</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Car size={18} className="text-amber-600" />
+                                <span>Parking</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <AlarmSmoke size={18} className="text-amber-600" />
+                                <span>Smoke Alarm</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Fan size={18} className="text-amber-600" />
+                                <span>Ceiling Fan</span>
+                            </div>
+
                         </div>
                     </div>
 
@@ -453,7 +539,7 @@ const RoomDetails = () => {
 
                         <button
                             onClick={handleBooking}
-                            className="w-full py-4 rounded-2xl font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 transition shadow-md cursor-pointer"
+                            className="w-full py-4 rounded-2xl font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 transition shadow-md cursor-pointer focus:outline-none"
                         >
                             Confirm Reservation
                         </button>

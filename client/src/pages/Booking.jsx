@@ -86,7 +86,7 @@ const ClientBooking = () => {
     };
 
     return (
-        <div className="pt-24 pb-20 px-4 sm:px-6 bg-gray-50 min-h-screen">
+        <div className="pt-24 pb-20 px-4 sm:px-6 min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
@@ -235,7 +235,7 @@ const ClientBooking = () => {
                                                     <button
                                                         onClick={() => handleCancel(booking._id)}
                                                         disabled={cancellingId === booking._id}
-                                                        className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl text-sm transition disabled:opacity-50 cursor-pointer"
+                                                        className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-sm transition disabled:opacity-50 cursor-pointer"
                                                     >
                                                         {cancellingId === booking._id
                                                             ? "Cancelling..."
