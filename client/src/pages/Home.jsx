@@ -83,7 +83,7 @@ const Home = () => {
             {/* ================= SERVICES ================= */}
             <section className="py-5 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-6">
-                    <h2 className="text-4xl font-semibold text-center mb-16">Premium Services</h2>
+                    <h2 className="text-4xl font-semibold text-amber-600 text-center mb-16">Premium Services</h2>
 
                     <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
                         {services.map((service, i) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Linkedin, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -24,10 +24,13 @@ const Footer = () => {
 
                     {/* Social Icons */}
                     <div className="flex gap-4 pt-2">
-                        {[Facebook, Instagram, Twitter].map((Icon, i) => (
+                        {[Facebook, Instagram, Twitter, Linkedin, Youtube].map((Icon, i) => (
                             <div
                                 key={i}
-                                className="p-2 rounded-full bg-white shadow-md hover:bg-amber-500 hover:text-white transition cursor-pointer"
+                                className="p-2 rounded-full bg-white shadow-md 
+                 hover:bg-amber-600 hover:text-white 
+                 transform hover:scale-110 
+                 transition-all duration-300 cursor-pointer"
                             >
                                 <Icon size={18} />
                             </div>

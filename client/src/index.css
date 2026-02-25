@@ -9,6 +9,10 @@
     }
 }
 
+body {
+    font-family: 'Lato', sans-serif;
+}
+
 .animate-marquee {
     animation: marquee 30s linear infinite;
     width: max-content;

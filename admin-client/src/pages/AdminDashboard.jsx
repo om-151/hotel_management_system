@@ -7,7 +7,7 @@ const AdminDashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="flex min-h-screen bg-slate-100">
+        <div className="flex min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
             <DashboardSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
 
             <div className="flex-1 flex flex-col">

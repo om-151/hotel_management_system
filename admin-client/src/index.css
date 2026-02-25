@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+body {
+    font-family: 'Lato', sans-serif;
+}
+
 /* Hide default scrollbar but keep scroll functionality */
 .custom-scroll::-webkit-scrollbar {
     width: 6px;

@@ -86,7 +86,7 @@ const Login = () => {
             </div>
 
             {/* RIGHT FORM SECTION */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 px-6 py-12">
+            <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-[#7bd6e43b] via-white to-[#7bd6e42e] px-6 py-12">
 
                 <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 sm:p-10">
 

@@ -78,10 +78,10 @@ const AboutServices = () => {
   ];
 
   return (
-    <section className="bg-white text-gray-900">
+    <section className="bg-gradient-to-br from-amber-50 via-white to-amber-50 text-gray-900">
 
       {/* ================= HERO ================= */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-amber-50 to-white">
+      <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 pt-28 pb-32">
 
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -167,7 +167,7 @@ const AboutServices = () => {
       </div>
 
       {/* ================= SERVICES ================= */}
-      <div className="py-5 bg-gray-50">
+      <div className="py-5">
         <div className="max-w-7xl mx-auto px-6">
 
           {/* Cards */}
@@ -195,7 +195,7 @@ const AboutServices = () => {
       </div>
 
       {/* ================= MISSION & VISION ================= */}
-      <div className="py-20 bg-white">
+      <div className="py-20">
         <div className="max-w-7xl mx-auto px-6">
 
           {/* Section Header */}
@@ -216,7 +216,7 @@ const AboutServices = () => {
           <div className="grid md:grid-cols-2 gap-12">
 
             {/* Mission */}
-            <div className="group bg-gray-50 border border-gray-200 rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-300">
+            <div className="group bg-white border border-gray-200 rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-amber-100 text-amber-600 mb-6 group-hover:bg-amber-600 group-hover:text-white transition">
                 <Target size={26} />
               </div>
@@ -233,7 +233,7 @@ const AboutServices = () => {
             </div>
 
             {/* Vision */}
-            <div className="group bg-gray-50 border border-gray-200 rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-300">
+            <div className="group bg-white border border-gray-200 rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-amber-100 text-amber-600 mb-6 group-hover:bg-amber-600 group-hover:text-white transition">
                 <Globe size={26} />
               </div>

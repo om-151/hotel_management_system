@@ -223,10 +223,10 @@ const Bookings = () => {
     };
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="p-6 min-h-screen">
             <div className="bg-white p-6 rounded-2xl shadow-md">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                    <h1 className="text-2xl font-bold text-gray-800">
+                    <h1 className="text-2xl font-semibold text-gray-800">
                         Manage Bookings
                     </h1>
 

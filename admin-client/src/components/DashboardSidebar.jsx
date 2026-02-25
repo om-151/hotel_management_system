@@ -37,17 +37,17 @@ const DashboardSidebar = ({ isOpen, setIsOpen }) => {
             <aside
                 className={`fixed lg:sticky top-0 left-0 z-40
     h-screen w-72 shrink-0
-    bg-white border-r border-gray-200
+    bg-gradient-to-br from-amber-50 via-white to-white border-r border-gray-100
     transition-transform duration-300
     ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
             >
                 {/* Brand */}
-                <div className="px-6 py-3 border-b border-gray-200">
+                <div className="px-6 py-3 border-b border-gray-100">
                     <h1 className="text-2xl font-bold tracking-tight text-amber-600">
                         Maricuot Admin
                     </h1>
                     <p className="text-xs text-gray-500">
-                        Hotel management system
+                        A Hotel Reservation System
                     </p>
                 </div>
 

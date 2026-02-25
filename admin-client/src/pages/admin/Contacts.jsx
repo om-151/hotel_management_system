@@ -156,11 +156,11 @@ const Contact = () => {
     };
 
     return (
-        <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+        <div className="p-4 sm:p-6 min-h-screen">
             <div className="bg-white rounded-2xl shadow-lg p-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">
+                    <h1 className="text-2xl font-semibold text-gray-800">
                         Contact Messages
                     </h1>
 
