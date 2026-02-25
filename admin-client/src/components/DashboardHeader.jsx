@@ -1,10 +1,22 @@
 import { useAdminAuth } from "../context/AdminAuthContext";
 import { FaUserCircle } from "react-icons/fa";
 import { useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 const DashboardHeader = ({ setIsOpen }) => {
     const { admin, logoutAdmin } = useAdminAuth();
     const btnRef = useRef(null);
+    const location = useLocation();
+
+    const getPageTitle = () => {
+        const path = location.pathname.split("/").pop();
+
+        if (!path || path === "admin") return "Overview";
+
+        return path
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
 
     const handleMouseEnter = (e) => {
         const btn = btnRef.current;
@@ -41,7 +53,7 @@ const DashboardHeader = ({ setIsOpen }) => {
                     </button>
 
                     <h2 className="text-xl font-semibold text-gray-900 tracking-tight">
-                        Dashboard
+                        {getPageTitle()}
                     </h2>
                 </div>
 
