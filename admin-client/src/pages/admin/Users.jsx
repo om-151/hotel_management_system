@@ -86,14 +86,19 @@ const Users = () => {
     // DataTable columns
     const columns = useMemo(() => [
         {
+            name: "",
+            center: true,
+            cell: () => (
+                <FaUserCircle className="w-8 h-8 text-gray-400" />
+            ),
+            button: true,
+        },
+        {
             name: "User",
             center: true,
             sortable: true,
             cell: (row) => (
-                <div className="flex items-center justify-center gap-3">
-                    <FaUserCircle className="w-8 h-8 text-gray-400" />
-                    <span className="font-medium">{row.name}</span>
-                </div>
+                <span className="font-medium">{row.name}</span>
             ),
         },
         {

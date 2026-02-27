@@ -36,11 +36,24 @@ const userSignup = async (req, res) => {
             password: hashedPassword,
         });
 
-        // 5️⃣ Response
+        // 5️⃣ Generate JWT token (same as login)
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.USER_JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRE }
+        );
+
+        // 6️⃣ Return SAME structure as login
         res.status(201).json({
             message: "User registered successfully",
-            userId: user._id,
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+            },
         });
+
     } catch (error) {
         res.status(500).json({
             message: "User signup failed",

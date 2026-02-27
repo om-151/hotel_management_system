@@ -71,7 +71,7 @@ const DashboardHeader = ({ setIsOpen }) => {
                     </div>
 
                     {/* Avatar */}
-                    <FaUserCircle className="hidden md:block w-10 h-10 text-gray-500" />
+                    <FaUserCircle className="hidden md:block w-10 h-10 text-gray-400" />
 
                     {/* Logout */}
                     <button

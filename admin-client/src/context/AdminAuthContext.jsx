@@ -44,21 +44,7 @@ export const AdminAuthProvider = ({ children }) => {
     // SIGNUP
     const signupAdmin = async (formData) => {
         const res = await API.post("/auth/signup", formData);
-
-        localStorage.setItem("adminToken", res.data.token);
-
-        // ✅ store admin profile
-        localStorage.setItem(
-            "adminProfile",
-            JSON.stringify({
-                _id: res.data.admin._id,
-                name: res.data.admin.name,
-                email: res.data.admin.email,
-            })
-        );
-
-        setToken(res.data.token);
-        setAdmin(res.data.admin);
+        return res.data;
     };
 
     // LOGOUT

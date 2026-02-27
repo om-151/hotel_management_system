@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import DataTable from "react-data-table-component";
+import { Star } from "lucide-react";
 import API from "../../api/axios";
 import { PencilIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/outline";
 import RoomForm from "./RoomForm";
@@ -115,7 +116,14 @@ const Rooms = () => {
         {
             name: "Rating",
             sortable: true,
-            selector: (row) => `⭐ ${row.rating}`,
+            selector: (row) => row.rating,
+            center: true,
+            cell: (row) => (
+                <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span className="font-medium">{row.rating}</span>
+                </div>
+            ),
         },
         {
             name: "Status",

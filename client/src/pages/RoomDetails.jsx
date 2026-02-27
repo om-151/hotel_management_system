@@ -211,8 +211,6 @@ const RoomDetails = () => {
     if (!room) return <div>Room not found</div>;
     const discount = nights >= 5 ? 10 : 0;
     const totalPrice = nights * (room?.price || 0);
-    const finalPrice =
-        totalPrice - (totalPrice * discount) / 100;
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-6 mt-5">
@@ -400,7 +398,7 @@ const RoomDetails = () => {
                         {/* DATE SELECTOR */}
                         <div
                             onClick={() => setShowCalendar(true)}
-                            className="border rounded-2xl p-4 cursor-pointer hover:border-amber-500 transition"
+                            className="border rounded-2xl p-4 cursor-pointer transition"
                         >
                             <div className="flex justify-between text-sm">
                                 <div>

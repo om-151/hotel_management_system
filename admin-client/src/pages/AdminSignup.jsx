@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext";
 import signupBG from "../assets/signup-bg.jpg";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const AdminSignup = () => {
     const { signupAdmin } = useAdminAuth();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         name: "",
@@ -56,6 +57,7 @@ const AdminSignup = () => {
         try {
             setLoading(true);
             await signupAdmin(formData);
+            navigate("/admin/login");
         } catch (err) {
             setErrors({
                 general: err.response?.data?.message || "Signup failed",
