@@ -107,9 +107,14 @@ const Contact = () => {
             },
             {
                 name: "Subject",
-                center: true,
-                selector: (row) => row.subject,
                 sortable: true,
+                center: true,
+                grow: 1,
+                cell: (row) => (
+                    <div className="max-w-[200px] truncate text-gray-700">
+                        {row.subject}
+                    </div>
+                ),
             },
             {
                 name: "Date",
